@@ -1,0 +1,36 @@
+{
+  "name": "seplag-untamed-quiz",
+  "version": "1.0.0",
+  "description": "Simulado SEPLAG-RJ FGV 2026 · Tema The Untamed",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "br.concurso.seplag.untamed",
+    "productName": "Simulado SEPLAG-RJ · 陈情令",
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Simulado SEPLAG-RJ"
+    }
+  },
+  "devDependencies": {
+    "electron": "^26.6.10",
+    "electron-builder": "^24.0.0"
+  }
+}
