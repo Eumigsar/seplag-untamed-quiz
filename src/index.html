@@ -162,8 +162,8 @@ details .db{margin-top:7px;padding:9px 12px;background:rgba(5,24,13,0.92);border
 #uinp:focus{border-color:var(--jade2)}
 /* TIMER + BADGE */
 #timer-disp{font-size:11px;color:var(--sky3);letter-spacing:1px;white-space:nowrap;font-family:'Courier New',monospace;min-width:66px;text-align:right}
-#user-badge{font-size:11px;color:var(--gold2);letter-spacing:1px;white-space:nowrap;padding:4px 10px;border:1px solid rgba(200,136,8,0.38);border-radius:3px;background:rgba(36,22,0,0.75);cursor:pointer;transition:all 0.15s}
-#user-badge:hover{border-color:var(--gold2);background:rgba(48,30,0,0.9)}
+#user-badge{font-size:12px;color:var(--gold3);letter-spacing:1px;white-space:nowrap;padding:5px 12px;border:1px solid rgba(252,208,64,0.55);border-radius:3px;background:rgba(48,28,0,0.90);cursor:pointer;transition:all 0.15s;box-shadow:0 0 8px rgba(252,208,64,0.18)}
+#user-badge:hover{border-color:var(--gold2);background:rgba(64,36,0,0.96);box-shadow:0 0 14px rgba(252,208,64,0.35)}
 
 /* PERSONAGEM POPUP */
 #cpop{position:fixed;bottom:0;right:calc(50% - 500px);width:325px;z-index:200;display:none;flex-direction:row;align-items:flex-end;pointer-events:none}
@@ -515,8 +515,12 @@ details .db{margin-top:7px;padding:9px 12px;background:rgba(5,24,13,0.92);border
     <div style="font-size:10px;color:var(--sky3);letter-spacing:3px;margin-bottom:22px">SIMULADO SEPLAG-RJ · 陈情令</div>
     <div style="font-size:13px;color:var(--mist);margin-bottom:15px;font-family:Georgia,serif">Como te chamas, cultivador?</div>
     <div id="ulist"></div>
-    <input id="uinp" type="text" placeholder="novo cultivador..." maxlength="30" autocomplete="off"/>
+    <input id="uinp" type="text" placeholder="novo cultivador..." maxlength="30" autocomplete="off"
+      onkeydown="if(event.key==='Enter')enterUser()"/>
     <button class="bmain" style="margin-top:13px" onclick="enterUser()">→ entrar no caminho do cultivo</button>
+    <div id="umodal-skip" style="display:none;margin-top:10px">
+      <button class="bg" style="width:100%;font-size:11px" onclick="document.getElementById('user-modal').style.display='none'">continuar sem nome</button>
+    </div>
   </div>
 </div>
 
@@ -976,6 +980,11 @@ function renderUList(){
     document.getElementById('user-modal').style.display='none';
   }else{
     document.getElementById('user-modal').style.display='flex';
+    // Se já existem usuários cadastrados, mostra botão de pular
+    if(getUserList().length>0){
+      const sk=document.getElementById('umodal-skip');
+      if(sk)sk.style.display='block';
+    }
   }
 })();
 
@@ -1552,12 +1561,24 @@ function renderHist(){
     </div>`;
   }).join('');
 
-  const uName=curUser||'convidado';
+  const uName=curUser||'';
   const sessLabel=(userData.sessions||0)+' simulado'+(( userData.sessions||0)!==1?'s':'');
+  // Se não tem usuário, mostra bloco de cadastro em destaque
+  const noUserBlock=!uName?`
+    <div style="background:rgba(252,208,64,0.10);border:1px solid rgba(252,208,64,0.45);border-radius:6px;padding:14px 16px;margin-bottom:14px;text-align:center">
+      <div style="font-size:13px;color:var(--gold3);letter-spacing:1px;margin-bottom:8px">✦ Identifique-se, cultivador</div>
+      <div style="display:flex;gap:8px;max-width:340px;margin:0 auto">
+        <input id="uinp2" type="text" placeholder="seu nome..." maxlength="30"
+          style="flex:1;background:rgba(8,18,42,0.92);border:1px solid rgba(252,208,64,0.45);border-radius:3px;color:var(--mist);font-family:Georgia,serif;font-size:13px;padding:7px 11px;outline:none"
+          onkeydown="if(event.key==='Enter'){var v=this.value.trim();if(v)setUser(v);}"/>
+        <button class="bj" onclick="var v=document.getElementById('uinp2').value.trim();if(v)setUser(v)">→ entrar</button>
+      </div>
+    </div>`:'';
   el.innerHTML=`
+    ${noUserBlock}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <div>
-        <div style="font-size:13px;color:var(--gold2);letter-spacing:1px">✦ ${uName}</div>
+        <div style="font-size:14px;color:var(--gold3);letter-spacing:1px;font-weight:600">✦ ${uName||'Convidado'}</div>
         <div style="font-size:10px;color:var(--cloud2);letter-spacing:1px;margin-top:3px">${sessLabel} concluído${(userData.sessions||0)!==1?'s':''}</div>
       </div>
       <button class="bg" style="font-size:10px;padding:4px 12px" onclick="showUserModal()">trocar cultivador</button>
