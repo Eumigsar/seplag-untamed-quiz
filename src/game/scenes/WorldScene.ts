@@ -281,26 +281,18 @@ export default class WorldScene extends Phaser.Scene {
 
   // ─── Player ────────────────────────────────────────────────────────────────
 
-  private outfitTint(outfit: string): number {
-    const map: Record<string, number> = {
-      'shaolin-monk':       0xf97316,
-      'silk-merchant':      0xa855f7,
-      'wandering-warrior':  0x64748b,
-      'jade-scholar':       0x22c55e,
-      'imperial-guard':     0xef4444,
-      'taoist-hermit':      0xe2e8f0,
-    };
-    return map[outfit] ?? 0xffffff;
+  private playerSpriteKey(): string {
+    const g = this.playerGender === 'female' ? 'f' : 'm';
+    if (this.playerOutfit) return `player-${g}-${this.playerOutfit}`;
+    return `player-${g}`;
   }
 
   private createPlayer() {
-    const spriteKey = this.playerGender === 'female' ? 'player-f' : 'player-m';
     this.player = this.physics.add.sprite(
       GAME_WIDTH  / 2,
       GAME_HEIGHT / 2,
-      spriteKey,
+      this.playerSpriteKey(),
     ).setDepth(DEPTHS.player);
-    if (this.playerOutfit) this.player.setTint(this.outfitTint(this.playerOutfit));
     this.player.setCollideWorldBounds(true);
     this.player.body.setSize(12, 16);
     this.player.body.setOffset(2, 14);
