@@ -127,15 +127,31 @@ export default function QuestLog() {
                     className="mt-2 pt-2 border-t border-gold-700/20"
                   >
                     <p className="text-xs text-gray-300 mb-2">{q.description}</p>
-                    <div className="space-y-1 mb-2">
-                      {q.objectives.map((obj) => (
-                        <div key={obj.id} className="flex items-center gap-1 text-xs">
-                          <span className="text-gold-400">
-                            {obj.type === 'learn' ? '📖' : obj.type === 'talk' ? '💬' : obj.type === 'collect' ? '🎒' : '✓'}
-                          </span>
-                          <span className="text-gray-400">{obj.description}</span>
-                        </div>
-                      ))}
+                    <div className="space-y-2 mb-2">
+                      {q.objectives.map((obj) => {
+                        const done = obj.current >= obj.quantity;
+                        return (
+                          <div key={obj.id} className={`text-xs ${done ? 'opacity-50' : ''}`}>
+                            <div className="flex items-center gap-1">
+                              <span className="text-gold-400">
+                                {done ? '✅' : obj.type === 'learn' ? '📖' : obj.type === 'talk' ? '💬' : obj.type === 'collect' ? '🎒' : '◯'}
+                              </span>
+                              <span className={done ? 'line-through text-gray-500' : 'text-gray-300'}>{obj.description}</span>
+                            </div>
+                            {obj.quantity > 1 && (
+                              <div className="mt-1 ml-5">
+                                <div className="h-1 bg-ink-700 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-1 rounded-full ${done ? 'bg-jade-500' : 'bg-gold-500'}`}
+                                    style={{ width: `${Math.min(100, (obj.current / obj.quantity) * 100)}%` }}
+                                  />
+                                </div>
+                                <span className="text-[10px] text-gray-500">{obj.current}/{obj.quantity}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                     <div className="pt-2 border-t border-gold-700/20">
                       <p className="text-[10px] text-gold-400 mb-1">Recompensas:</p>

@@ -7,6 +7,7 @@ import { useGameStore } from '@/store/gameStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useVocabularyStore } from '@/store/vocabularyStore';
 import { NPCS } from '@/data/npcs';
+import { getVocabById } from '@/data/vocabulary';
 import HUD from '@/components/game/HUD';
 import SifuDialog from '@/components/game/SifuDialog';
 import VocabularyPanel from '@/components/game/VocabularyPanel';
@@ -74,9 +75,23 @@ export default function GamePage() {
   if (!character) return null;
 
   const handleWordLearned = (wordId: string) => {
+    const wasNew = !useVocabularyStore.getState().getProgress(wordId)?.learned;
     markSeen(wordId);
     learnWord(wordId);
     gainXP(5);
+    if (wasNew) {
+      const word = getVocabById(wordId);
+      if (word) {
+        useGameStore.getState().showNotification({
+          type: 'vocabulary',
+          title: '✨ +5 XP · Nova Palavra!',
+          hanzi: word.hanzi,
+          pinyin: word.pinyin,
+          message: word.translation,
+          duration: 2500,
+        });
+      }
+    }
   };
 
   const handleQuestGiven = (questId: string) => {

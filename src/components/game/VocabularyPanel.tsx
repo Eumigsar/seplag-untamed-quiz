@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVocabularyStore } from '@/store/vocabularyStore';
 import { usePlayerStore } from '@/store/playerStore';
@@ -34,11 +34,16 @@ export default function VocabularyPanel() {
   const { progress, totalLearned, totalMastered } = useVocabularyStore();
   const [tab, setTab] = useState<'browse' | 'learned' | 'review'>('browse');
   const [selectedCat, setSelectedCat] = useState<VocabCategory | 'all'>('all');
-  const [selectedHsk, setSelectedHsk] = useState<number>(4);
+  const [selectedHsk, setSelectedHsk] = useState<number>(character?.hskLevel ?? 1);
   const [selectedWord, setSelectedWord] = useState<typeof ALL_VOCAB[0] | null>(null);
   const [search, setSearch] = useState('');
 
   const hskMax = character?.hskLevel ?? 1;
+
+  // Reset selectedHsk if it exceeds the player's current hskMax
+  useEffect(() => {
+    if (selectedHsk > hskMax) setSelectedHsk(hskMax);
+  }, [hskMax]);
 
   const filteredWords = useMemo(() => {
     let words = ALL_VOCAB.filter(w => w.hsk <= Math.min(selectedHsk, hskMax));
