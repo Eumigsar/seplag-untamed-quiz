@@ -4,187 +4,403 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ──────────────────────────────────────────────
-   CSS Custom Properties
-────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   CSS Custom Properties — Genshin Impact palette
+───────────────────────────────────────────────────── */
 :root {
-  --color-ink-950: #0a0d12;
-  --color-ink-900: #0d1117;
-  --color-ink-800: #161b22;
-  --color-gold-300: #d4af37;
-  --color-gold-400: #c9a227;
-  --color-jade-300: #4ade80;
-  --scrollbar-bg: #0d1117;
-  --scrollbar-thumb: #2d4a3e;
+  --gi-abyss:      #050810;
+  --gi-deep:       #090d22;
+  --gi-navy:       #0e1230;
+  --gi-panel:      #0b1028;
+  --gi-geo:        #c9a86c;
+  --gi-geo-light:  #e0c07a;
+  --gi-geo-dim:    rgba(201, 168, 108, 0.35);
+  --gi-anemo:      #74d4a8;
+  --gi-anemo-dim:  rgba(116, 212, 168, 0.35);
+  --gi-celestial:  #8a9bbf;
+  --gi-text:       #f0e8d0;
+  --gi-text-dim:   #98aad0;
+  --scrollbar-bg:  #090d22;
+  --scrollbar-thumb: #1e2558;
 }
 
-/* ──────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────
    Base Reset
-────────────────────────────────────────────── */
+───────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
 }
-
-html {
-  scroll-behavior: smooth;
-}
-
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--color-ink-950);
-  color: #e8dcc8;
+  background-color: var(--gi-abyss);
+  color: var(--gi-text);
   font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* ──────────────────────────────────────────────
-   Scrollbar Styling
-────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--scrollbar-bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3d6b52;
-}
+/* ─────────────────────────────────────────────────────
+   Scrollbar
+───────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb  { background: var(--scrollbar-thumb); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #2d4080; }
 
-/* ──────────────────────────────────────────────
-   Chinese Font Class
-────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   Fonts
+───────────────────────────────────────────────────── */
 .font-chinese {
   font-family: 'Noto Serif SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', serif;
 }
 
-/* ──────────────────────────────────────────────
-   Game Canvas
-────────────────────────────────────────────── */
-#game-canvas canvas {
-  display: block;
-  outline: none;
-}
+/* ─────────────────────────────────────────────────────
+   Game canvas
+───────────────────────────────────────────────────── */
+#game-canvas canvas { display: block; outline: none; }
 
-/* ──────────────────────────────────────────────
-   Selection
-────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   Selection & Focus
+───────────────────────────────────────────────────── */
 ::selection {
-  background: rgba(184, 134, 11, 0.4);
+  background: rgba(201, 168, 108, 0.35);
   color: #fff;
 }
-
-/* ──────────────────────────────────────────────
-   Focus ring
-────────────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid #d4af37;
+  outline: 1.5px solid var(--gi-geo);
   outline-offset: 2px;
 }
 
-/* ──────────────────────────────────────────────
-   Typography utilities
-────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   ══ GENSHIN IMPACT PANEL SYSTEM ══
+───────────────────────────────────────────────────── */
+
+/* Base panel — dark navy glass with gold trim */
+.gi-panel {
+  position: relative;
+  background: rgba(9, 13, 34, 0.92);
+  border: 1px solid var(--gi-geo-dim);
+  border-radius: 4px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 4px 32px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(201, 168, 108, 0.08);
+}
+
+/* Corner ornaments — top-left & bottom-right via pseudo */
+.gi-panel::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px;
+  width: 12px; height: 12px;
+  border-top: 2px solid rgba(201, 168, 108, 0.75);
+  border-left: 2px solid rgba(201, 168, 108, 0.75);
+  pointer-events: none;
+  z-index: 1;
+}
+.gi-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 12px; height: 12px;
+  border-bottom: 2px solid rgba(201, 168, 108, 0.75);
+  border-right: 2px solid rgba(201, 168, 108, 0.75);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* All 4 corners variant — top-right & bottom-left added on inner element */
+.gi-corner-tr {
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 12px; height: 12px;
+  border-top: 2px solid rgba(201, 168, 108, 0.75);
+  border-right: 2px solid rgba(201, 168, 108, 0.75);
+  pointer-events: none;
+  z-index: 1;
+}
+.gi-corner-bl {
+  position: absolute;
+  bottom: -1px; left: -1px;
+  width: 12px; height: 12px;
+  border-bottom: 2px solid rgba(201, 168, 108, 0.75);
+  border-left: 2px solid rgba(201, 168, 108, 0.75);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Teal variant for jade/anemo elements */
+.gi-panel-teal {
+  border-color: var(--gi-anemo-dim);
+}
+.gi-panel-teal::before,
+.gi-panel-teal::after {
+  border-color: rgba(116, 212, 168, 0.7);
+}
+
+/* Darker panel (for nested elements) */
+.gi-panel-inner {
+  background: rgba(5, 8, 20, 0.7);
+  border: 1px solid rgba(201, 168, 108, 0.18);
+  border-radius: 3px;
+}
+
+/* ─────────────────────────────────────────────────────
+   ══ GENSHIN DIVIDER ══
+───────────────────────────────────────────────────── */
+.gi-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(201, 168, 108, 0.45) 20%,
+    rgba(201, 168, 108, 0.45) 80%,
+    transparent
+  );
+  margin: 0;
+}
+.gi-divider-teal {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(116, 212, 168, 0.4) 20%,
+    rgba(116, 212, 168, 0.4) 80%,
+    transparent
+  );
+}
+
+/* ─────────────────────────────────────────────────────
+   ══ GENSHIN STAT BARS ══
+───────────────────────────────────────────────────── */
+.gi-bar {
+  height: 6px;
+  background: rgba(9, 13, 34, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.gi-bar-sm { height: 4px; }
+.gi-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+  position: relative;
+}
+.gi-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0;
+  width: 3px; height: 100%;
+  background: white;
+  opacity: 0.6;
+  border-radius: 0 2px 2px 0;
+  filter: blur(1px);
+}
+.gi-bar-hp  { background: linear-gradient(to right, #b02030, #e04055); }
+.gi-bar-mp  { background: linear-gradient(to right, #2040a8, #3870e0); }
+.gi-bar-xp  { background: linear-gradient(to right, #8a6030, #c9a86c); }
+.gi-bar-obj { background: linear-gradient(to right, #2d6870, #44a8b8); }
+
+/* ─────────────────────────────────────────────────────
+   ══ GENSHIN BUTTONS ══
+───────────────────────────────────────────────────── */
+
+/* Base button */
+.gi-btn {
+  border: 1px solid rgba(201, 168, 108, 0.38);
+  background: rgba(9, 13, 34, 0.85);
+  color: var(--gi-geo);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.gi-btn:hover {
+  border-color: rgba(201, 168, 108, 0.75);
+  background: rgba(201, 168, 108, 0.1);
+  box-shadow: 0 0 12px rgba(201, 168, 108, 0.25);
+  color: var(--gi-geo-light);
+}
+
+/* Active / selected button */
+.gi-btn-active {
+  border-color: rgba(201, 168, 108, 0.9);
+  background: rgba(201, 168, 108, 0.18);
+  box-shadow: 0 0 16px rgba(201, 168, 108, 0.4), inset 0 0 8px rgba(201, 168, 108, 0.08);
+  color: var(--gi-geo-light);
+}
+
+/* Primary gold button */
+.gi-btn-primary {
+  background: linear-gradient(to bottom, rgba(224, 192, 122, 0.9), rgba(168, 133, 72, 0.9));
+  border-color: rgba(224, 200, 140, 0.8);
+  color: #1a0f00;
+  font-weight: 600;
+}
+.gi-btn-primary:hover {
+  background: linear-gradient(to bottom, rgba(240, 210, 140, 0.95), rgba(201, 168, 108, 0.95));
+  box-shadow: 0 0 20px rgba(201, 168, 108, 0.5);
+  color: #0a0800;
+}
+
+/* Teal secondary button */
+.gi-btn-teal {
+  border-color: rgba(116, 212, 168, 0.4);
+  color: #74d4a8;
+}
+.gi-btn-teal:hover {
+  border-color: rgba(116, 212, 168, 0.8);
+  background: rgba(116, 212, 168, 0.1);
+  box-shadow: 0 0 12px rgba(116, 212, 168, 0.25);
+}
+
+/* ─────────────────────────────────────────────────────
+   ══ GENSHIN SKILL BUTTON (circular / square icon) ══
+───────────────────────────────────────────────────── */
+.gi-skill-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid rgba(201, 168, 108, 0.28);
+  background: rgba(9, 13, 34, 0.9);
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.gi-skill-btn:hover {
+  border-color: rgba(201, 168, 108, 0.65);
+  background: rgba(201, 168, 108, 0.08);
+  box-shadow: 0 0 10px rgba(201, 168, 108, 0.2);
+}
+.gi-skill-btn.active {
+  border-color: rgba(201, 168, 108, 0.9);
+  background: rgba(201, 168, 108, 0.16);
+  box-shadow: 0 0 14px rgba(201, 168, 108, 0.45);
+}
+
+/* ─────────────────────────────────────────────────────
+   ══ PORTRAIT FRAME ══
+───────────────────────────────────────────────────── */
+.gi-portrait {
+  position: relative;
+  flex-shrink: 0;
+}
+.gi-portrait-inner {
+  border: 2px solid rgba(201, 168, 108, 0.6);
+  border-radius: 3px;
+  background: linear-gradient(135deg, rgba(14, 18, 48, 0.95), rgba(5, 8, 20, 0.95));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.4);
+}
+.gi-portrait-gold { border-color: rgba(201, 168, 108, 0.8); }
+.gi-portrait-teal { border-color: rgba(116, 212, 168, 0.7); }
+
+/* ─────────────────────────────────────────────────────
+   ══ TEXT UTILITIES ══
+───────────────────────────────────────────────────── */
+.text-gi-primary   { color: var(--gi-text); }
+.text-gi-secondary { color: var(--gi-text-dim); }
+.text-gi-geo       { color: var(--gi-geo); }
+.text-gi-geo-light { color: var(--gi-geo-light); }
+.text-gi-anemo     { color: var(--gi-anemo); }
+.text-gi-celestial { color: var(--gi-celestial); }
+
 .text-shadow-gold {
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  text-shadow: 0 0 20px rgba(201, 168, 108, 0.6);
+}
+.text-shadow-teal {
+  text-shadow: 0 0 20px rgba(116, 212, 168, 0.5);
 }
 
-.text-shadow-jade {
-  text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+/* ─────────────────────────────────────────────────────
+   Legacy / Compatibility classes
+───────────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(9, 13, 34, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(201, 168, 108, 0.28);
 }
 
-/* ──────────────────────────────────────────────
-   Accessibility — Dyslexia mode
-────────────────────────────────────────────── */
+.brush-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(201, 168, 108, 0.5) 20%,
+    rgba(201, 168, 108, 0.5) 80%,
+    transparent
+  );
+}
+
+/* ─────────────────────────────────────────────────────
+   Accessibility
+───────────────────────────────────────────────────── */
 body.dyslexia-mode {
   font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
   letter-spacing: 0.05em;
   word-spacing: 0.1em;
   line-height: 1.7;
 }
-
-body.large-font {
-  font-size: 18px;
-}
-
+body.large-font  { font-size: 18px; }
 body.high-contrast {
-  --color-ink-900: #000000;
-  --color-ink-800: #0a0a0a;
+  --gi-deep: #000000;
   filter: contrast(1.2);
 }
 
-/* ──────────────────────────────────────────────
-   Pinyin tone marks helper classes
-────────────────────────────────────────────── */
-.tone-1 { color: #ef4444; }   /* — high flat */
-.tone-2 { color: #f59e0b; }   /* ´ rising    */
-.tone-3 { color: #10b981; }   /* ˇ dipping   */
-.tone-4 { color: #3b82f6; }   /* ` falling   */
-.tone-5 { color: #9ca3af; }   /* neutral      */
+/* Pinyin tone marks */
+.tone-1 { color: #ef4444; }
+.tone-2 { color: #f59e0b; }
+.tone-3 { color: #10b981; }
+.tone-4 { color: #3b82f6; }
+.tone-5 { color: #9ca3af; }
 
-/* ──────────────────────────────────────────────
-   Loading spinner
-────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   Animations
+───────────────────────────────────────────────────── */
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
+.animate-spin-slow { animation: spin-slow 3s linear infinite; }
 
-/* ──────────────────────────────────────────────
-   Dragon animation
-────────────────────────────────────────────── */
 @keyframes dragon-fly {
-  0%   { transform: translateX(-10px) rotate(-2deg); }
-  50%  { transform: translateX(10px) rotate(2deg); }
-  100% { transform: translateX(-10px) rotate(-2deg); }
+  0%  { transform: translateX(-10px) rotate(-2deg); }
+  50% { transform: translateX(10px) rotate(2deg); }
+  100%{ transform: translateX(-10px) rotate(-2deg); }
 }
-.animate-dragon {
-  animation: dragon-fly 4s ease-in-out infinite;
-}
+.animate-dragon { animation: dragon-fly 4s ease-in-out infinite; }
 
-/* ──────────────────────────────────────────────
-   Brush stroke decorative line
-────────────────────────────────────────────── */
-.brush-divider {
-  height: 2px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    #b8860b 20%,
-    #d4af37 50%,
-    #b8860b 80%,
-    transparent
-  );
-  opacity: 0.6;
-}
-
-/* ──────────────────────────────────────────────
-   Glass card
-────────────────────────────────────────────── */
-.glass-card {
-  background: rgba(13, 17, 23, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(184, 134, 11, 0.3);
-}
-
-/* ──────────────────────────────────────────────
-   RPG notification pulse
-────────────────────────────────────────────── */
 @keyframes notification-glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
-  50%       { box-shadow: 0 0 24px rgba(212, 175, 55, 0.7); }
+  0%, 100% { box-shadow: 0 0 8px rgba(201, 168, 108, 0.3); }
+  50%       { box-shadow: 0 0 24px rgba(201, 168, 108, 0.7); }
 }
-.notification-glow {
-  animation: notification-glow 2s ease-in-out infinite;
+.notification-glow { animation: notification-glow 2s ease-in-out infinite; }
+
+@keyframes gi-breath {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+.animate-gi-breath { animation: gi-breath 3s ease-in-out infinite; }
+
+/* ─────────────────────────────────────────────────────
+   Panels slide entry
+───────────────────────────────────────────────────── */
+.gi-panel-slide-right {
+  animation: slideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 }

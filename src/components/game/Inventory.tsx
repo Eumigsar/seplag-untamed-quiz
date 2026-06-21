@@ -8,23 +8,23 @@ import { cn } from '@/lib/utils';
 
 const ITEM_ICONS: Record<string, string> = {
   'training-robe': '👘',
-  'rice-bundle': '🌾',
-  'tea-leaf': '🍃',
+  'rice-bundle':   '🌾',
+  'tea-leaf':      '🍃',
   'health-potion': '🧪',
-  'bamboo-staff': '🪄',
-  'jade-pendant': '💚',
-  'silk-cloth': '🎀',
-  'scroll': '📜',
+  'bamboo-staff':  '🪄',
+  'jade-pendant':  '💚',
+  'silk-cloth':    '🎀',
+  'scroll':        '📜',
 };
 
 const SLOT_LABELS: Record<string, string> = {
-  head: '帽子 Cabeça',
-  chest: '上衣 Torso',
-  legs: '裤子 Pernas',
-  feet: '鞋子 Pés',
-  hands: '手套 Mãos',
-  weapon: '武器 Arma',
-  offhand: '副手 Escudo',
+  head:      '帽子 Cabeça',
+  chest:     '上衣 Torso',
+  legs:      '裤子 Pernas',
+  feet:      '鞋子 Pés',
+  hands:     '手套 Mãos',
+  weapon:    '武器 Arma',
+  offhand:   '副手 Escudo',
   accessory: '配件 Acessório',
 };
 
@@ -43,27 +43,30 @@ export default function Inventory() {
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
-      className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-ink-900/98 border-l border-gold-700/40 z-40
-                 flex flex-col shadow-2xl backdrop-blur-sm"
+      transition={{ type: 'spring', damping: 24, stiffness: 260 }}
+      className="fixed right-0 top-0 bottom-0 w-full sm:w-80 z-40 flex flex-col
+                 bg-[rgba(9,13,34,0.97)] border-l border-[rgba(201,168,108,0.25)] shadow-2xl backdrop-blur-sm"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gold-700/30">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(201,168,108,0.18)]">
         <div>
-          <h2 className="font-chinese text-gold-300 text-lg">背包</h2>
-          <p className="text-xs text-gray-400">{inventory.length} itens · 💰 {stats.gold} moedas</p>
+          <h2 className="font-chinese text-gi-geo text-lg text-shadow-gold">背包</h2>
+          <p className="text-[11px] text-gi-text-dim">{inventory.length} itens · ◆ {stats.gold} moedas</p>
         </div>
-        <button onClick={() => setActivePanel('none')} className="text-gray-400 hover:text-white text-xl">✕</button>
+        <button onClick={() => setActivePanel('none')} className="text-gi-text-dim hover:text-gi-text text-lg transition-colors">✕</button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gold-700/20">
+      <div className="flex border-b border-[rgba(201,168,108,0.12)]">
         {(['items', 'equipment'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={cn(
               'flex-1 py-2 text-xs transition-colors',
-              tab === t ? 'text-gold-300 border-b-2 border-gold-500' : 'text-gray-400 hover:text-gray-200'
+              tab === t
+                ? 'text-gi-geo border-b-2 border-gi-geo'
+                : 'text-gi-text-dim hover:text-gi-text',
             )}
           >
             {t === 'items' ? '🎒 Itens' : '⚔️ Equipamento'}
@@ -72,20 +75,20 @@ export default function Inventory() {
       </div>
 
       {tab === 'equipment' ? (
-        <div className="flex-1 p-4 overflow-y-auto space-y-2">
+        <div className="flex-1 p-3 overflow-y-auto space-y-1.5">
           {(Object.keys(SLOT_LABELS) as Array<keyof typeof SLOT_LABELS>).map(slot => {
             const itemId = (equipment as Record<string, string | undefined>)[slot];
             return (
-              <div key={slot} className="flex items-center gap-3 bg-ink-800/60 border border-gold-700/20 rounded p-2">
-                <div className="w-10 h-10 bg-ink-700 rounded border border-gold-700/30 flex items-center justify-center text-xl">
+              <div key={slot} className="flex items-center gap-3 gi-panel-inner p-2">
+                <div className="w-10 h-10 bg-[rgba(5,8,20,0.8)] rounded border border-[rgba(201,168,108,0.2)] flex items-center justify-center text-xl">
                   {itemId ? (ITEM_ICONS[itemId] ?? '🎽') : '○'}
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs text-gray-400">{SLOT_LABELS[slot]}</div>
+                  <div className="text-[10px] text-gi-text-dim">{SLOT_LABELS[slot]}</div>
                   {itemId ? (
-                    <div className="text-sm text-gold-300">{itemId}</div>
+                    <div className="text-sm text-gi-geo">{itemId}</div>
                   ) : (
-                    <div className="text-sm text-gray-600">— Vazio —</div>
+                    <div className="text-sm text-[#445]">— Vazio —</div>
                   )}
                 </div>
               </div>
@@ -97,9 +100,9 @@ export default function Inventory() {
           <div className="flex-1 overflow-y-auto p-3">
             {inventory.length === 0 ? (
               <div className="text-center mt-12">
-                <div className="text-4xl mb-3">🎒</div>
-                <p className="text-gray-500 text-sm">Mochila vazia</p>
-                <p className="text-gray-600 text-xs mt-1">Fale com o Mercador Wei para comprar itens</p>
+                <div className="text-4xl mb-3 opacity-30">🎒</div>
+                <p className="text-gi-text-dim text-sm">Mochila vazia</p>
+                <p className="text-[11px] text-[#445] mt-1">Fale com o Mercador Wei para comprar itens</p>
               </div>
             ) : (
               <div className="grid grid-cols-5 gap-1.5">
@@ -108,18 +111,16 @@ export default function Inventory() {
                     key={`${item.itemId}-${i}`}
                     onClick={() => setSelected(selected?.itemId === item.itemId ? null : item)}
                     className={cn(
-                      'aspect-square bg-ink-800 rounded border p-1 flex flex-col items-center justify-center transition-all',
+                      'aspect-square rounded border p-1 flex flex-col items-center justify-center transition-all',
                       selected?.itemId === item.itemId
-                        ? 'border-gold-400 bg-ink-700'
-                        : 'border-gold-700/20 hover:border-gold-700/50'
+                        ? 'border-[rgba(201,168,108,0.8)] bg-[rgba(201,168,108,0.12)]'
+                        : 'border-[rgba(201,168,108,0.15)] bg-[rgba(5,8,20,0.6)] hover:border-[rgba(201,168,108,0.4)]',
                     )}
                     title={item.itemId}
                   >
-                    <span className="text-xl">
-                      {ITEM_ICONS[item.itemId] ?? '📦'}
-                    </span>
+                    <span className="text-xl">{ITEM_ICONS[item.itemId] ?? '📦'}</span>
                     {item.quantity > 1 && (
-                      <span className="text-[9px] text-gold-300">{item.quantity}</span>
+                      <span className="text-[9px] text-gi-geo">{item.quantity}</span>
                     )}
                   </button>
                 ))}
@@ -131,25 +132,25 @@ export default function Inventory() {
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="border-t border-gold-700/30 p-4"
+              className="border-t border-[rgba(201,168,108,0.2)] p-4"
             >
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-3xl">{ITEM_ICONS[selected.itemId] ?? '📦'}</span>
                 <div>
-                  <div className="text-sm font-medium text-gold-200">{selected.itemId}</div>
-                  <div className="text-xs text-gray-500">Quantidade: {selected.quantity}</div>
+                  <div className="text-sm font-medium text-gi-geo">{selected.itemId}</div>
+                  <div className="text-xs text-gi-text-dim">Quantidade: {selected.quantity}</div>
                 </div>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => { equipItem(selected.itemId, 'weapon'); setSelected(null); }}
-                  className="flex-1 py-1 text-xs bg-gold-700 hover:bg-gold-600 text-white rounded transition-colors"
+                  className="gi-btn gi-btn-primary flex-1 py-1.5 text-xs"
                 >
                   Equipar
                 </button>
                 <button
                   onClick={() => setSelected(null)}
-                  className="px-3 py-1 text-xs bg-ink-700 hover:bg-ink-600 text-gray-300 rounded transition-colors"
+                  className="gi-btn px-3 py-1.5 text-xs"
                 >
                   ✕
                 </button>

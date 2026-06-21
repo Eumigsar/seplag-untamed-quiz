@@ -6,17 +6,18 @@ import { usePlayerStore } from '@/store/playerStore';
 import { useGameStore } from '@/store/gameStore';
 import { isSupabaseConfigured, signIn, signUp } from '@/lib/supabase';
 import { initSpeech } from '@/lib/speech';
-import { cn } from '@/lib/utils';
 
-type Screen = 'landing' | 'auth' | 'loading';
+type Screen = 'landing' | 'auth';
 
 const INTRO_WORDS = [
-  { hanzi: '道', pinyin: 'Dào',   translation: 'O Caminho' },
-  { hanzi: '武', pinyin: 'Wǔ',    translation: 'Arte Marcial' },
-  { hanzi: '学', pinyin: 'Xué',   translation: 'Aprender' },
-  { hanzi: '师', pinyin: 'Shī',   translation: 'Mestre' },
-  { hanzi: '心', pinyin: 'Xīn',   translation: 'Coração' },
+  { hanzi: '道', pinyin: 'Dào', translation: 'O Caminho' },
+  { hanzi: '武', pinyin: 'Wǔ',  translation: 'Arte Marcial' },
+  { hanzi: '学', pinyin: 'Xué', translation: 'Aprender' },
+  { hanzi: '师', pinyin: 'Shī', translation: 'Mestre' },
+  { hanzi: '心', pinyin: 'Xīn', translation: 'Coração' },
 ];
+
+const FEATURES = ['HSK 1-4', '3000+ Palavras', 'Pronúncia Real', 'Kung Fu', 'Mundo Aberto', 'Gratuito'];
 
 export default function LandingPage() {
   const router = useRouter();
@@ -33,27 +34,18 @@ export default function LandingPage() {
 
   useEffect(() => {
     initSpeech();
-    if (character) {
-      setPhase('playing');
-      router.replace('/game');
-    }
+    if (character) { setPhase('playing'); router.replace('/game'); }
   }, [character]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setWordIdx(i => (i + 1) % INTRO_WORDS.length);
-    }, 2500);
-    return () => clearInterval(interval);
+    const t = setInterval(() => setWordIdx(i => (i + 1) % INTRO_WORDS.length), 2500);
+    return () => clearInterval(t);
   }, []);
 
   const continueAsGuest = () => {
     setGuestMode(true);
-    if (character) {
-      setPhase('playing');
-      router.push('/game');
-    } else {
-      router.push('/create-character');
-    }
+    router.push(character ? '/game' : '/create-character');
+    if (character) setPhase('playing');
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -61,20 +53,12 @@ export default function LandingPage() {
     setAuthError('');
     setAuthLoading(true);
     try {
-      if (authMode === 'signup') {
-        const { error } = await signUp(email, password);
-        if (error) { setAuthError(error.message); return; }
-        router.push('/create-character');
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) { setAuthError(error.message); return; }
-        if (character) {
-          setPhase('playing');
-          router.push('/game');
-        } else {
-          router.push('/create-character');
-        }
-      }
+      const { error } = authMode === 'signup'
+        ? await signUp(email, password)
+        : await signIn(email, password);
+      if (error) { setAuthError(error.message); return; }
+      if (character) { setPhase('playing'); router.push('/game'); }
+      else router.push('/create-character');
     } finally {
       setAuthLoading(false);
     }
@@ -83,33 +67,27 @@ export default function LandingPage() {
   const word = INTRO_WORDS[wordIdx];
 
   return (
-    <div className="min-h-screen bg-ink-950 flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Background Chinese characters */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-20 -left-20 font-chinese text-[400px] text-gold-900/5 leading-none select-none">龍</div>
-        <div className="absolute -bottom-20 -right-20 font-chinese text-[400px] text-jade-900/5 leading-none select-none">武</div>
-        <div className="absolute top-1/4 right-10 font-chinese text-[200px] text-crimson-900/5 leading-none select-none">道</div>
+    <div className="min-h-screen bg-[var(--gi-abyss)] flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Ambient background characters */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+        <div className="absolute -top-20 -left-20 font-chinese text-[400px] text-[rgba(201,168,108,0.04)] leading-none">龍</div>
+        <div className="absolute -bottom-20 -right-20 font-chinese text-[400px] text-[rgba(116,212,168,0.04)] leading-none">武</div>
+        <div className="absolute top-1/4 right-10 font-chinese text-[200px] text-[rgba(240,64,80,0.03)] leading-none">道</div>
       </div>
 
-      {/* Animated particles */}
+      {/* Floating geo particles */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-gold-500/30 rounded-full"
+            className="absolute w-1 h-1 rounded-full"
             style={{
-              left: `${10 + (i * 7.5)}%`,
-              top: `${15 + (i * 5.3)}%`,
+              background: i % 3 === 0 ? 'rgba(201,168,108,0.4)' : i % 3 === 1 ? 'rgba(116,212,168,0.3)' : 'rgba(138,155,191,0.25)',
+              left: `${10 + i * 7.5}%`,
+              top: `${15 + i * 5.3}%`,
             }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.8, 0.2],
-            }}
-            transition={{
-              duration: 3 + (i % 3),
-              repeat: Infinity,
-              delay: i * 0.3,
-            }}
+            animate={{ y: [0, -28, 0], opacity: [0.2, 0.7, 0.2] }}
+            transition={{ duration: 3 + (i % 3), repeat: Infinity, delay: i * 0.3 }}
           />
         ))}
       </div>
@@ -121,94 +99,80 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="relative z-10 flex flex-col items-center text-center px-6 max-w-2xl"
+            className="relative z-10 flex flex-col items-center text-center px-6 max-w-2xl w-full"
           >
-            {/* Rotating word showcase */}
-            <div className="mb-8 h-32 flex flex-col items-center justify-center">
+            {/* Rotating word */}
+            <div className="mb-8 h-36 flex flex-col items-center justify-center">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={wordIdx}
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                  initial={{ opacity: 0, y: 20, scale: 0.85 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.8 }}
-                  transition={{ duration: 0.5 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.85 }}
+                  transition={{ duration: 0.45 }}
                   className="text-center"
                 >
-                  <div className="font-chinese text-8xl text-gold-300 text-shadow-gold leading-none mb-2">
+                  <div className="font-chinese text-[7rem] leading-none text-gi-geo text-shadow-gold mb-2">
                     {word.hanzi}
                   </div>
-                  <div className="text-jade-300 text-lg">{word.pinyin}</div>
-                  <div className="text-gray-400 text-sm">{word.translation}</div>
+                  <div className="text-gi-anemo text-lg">{word.pinyin}</div>
+                  <div className="text-gi-text-dim text-sm">{word.translation}</div>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Title */}
+            {/* Title panel */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
+              className="gi-panel px-8 py-6 mb-8 relative"
             >
-              <h1 className="font-chinese text-4xl text-parchment-100 mb-1">武侠学堂</h1>
-              <p className="text-jade-300 text-lg mb-1">Wǔxiá Xuétáng</p>
-              <p className="text-gray-400 text-sm mb-6">Aprenda Mandarim através da Arte Marcial</p>
-              <div className="brush-divider w-48 mx-auto mb-6" />
-            </motion.div>
+              <div className="gi-corner-tr" /><div className="gi-corner-bl" />
+              <h1 className="font-chinese text-4xl text-gi-text mb-1">武侠学堂</h1>
+              <p className="text-gi-anemo text-lg mb-1">Wǔxiá Xuétáng</p>
+              <p className="text-gi-text-dim text-sm mb-5">Aprenda Mandarim através da Arte Marcial</p>
+              <div className="gi-divider mb-5" />
 
-            {/* Feature pills */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap justify-center gap-2 mb-8"
-            >
-              {['HSK 1-4', '3000+ Palavras', 'Pronúncia Real', 'Kung Fu', 'Mundo Aberto', 'Gratuito'].map(f => (
-                <span key={f} className="text-xs bg-ink-800 border border-gold-700/40 text-gold-300 px-3 py-1 rounded-full">
-                  {f}
-                </span>
-              ))}
-            </motion.div>
+              {/* Feature pills */}
+              <div className="flex flex-wrap justify-center gap-2 mb-6">
+                {FEATURES.map(f => (
+                  <span key={f} className="gi-btn text-xs px-3 py-1 cursor-default">
+                    {f}
+                  </span>
+                ))}
+              </div>
 
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="flex flex-col gap-3 w-full max-w-xs"
-            >
-              <button
-                onClick={continueAsGuest}
-                className="w-full py-4 bg-gradient-to-r from-jade-700 to-jade-600
-                           hover:from-jade-600 hover:to-jade-500 text-white font-bold rounded-xl
-                           transition-all shadow-lg text-lg"
-              >
-                🎋 Jogar Gratuitamente
-              </button>
+              {/* CTA */}
+              <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
+                <button
+                  onClick={continueAsGuest}
+                  className="gi-btn gi-btn-primary w-full py-3.5 text-base"
+                >
+                  🎋 Jogar Gratuitamente
+                </button>
 
-              {isSupabaseConfigured && (
-                <>
+                {isSupabaseConfigured && (
                   <button
                     onClick={() => setScreen('auth')}
-                    className="w-full py-3 bg-ink-800 hover:bg-ink-700 border border-gold-700/40
-                               hover:border-gold-500 text-gold-300 rounded-xl transition-all"
+                    className="gi-btn w-full py-3 text-sm"
                   >
                     👤 Entrar / Criar Conta
                   </button>
-                  <p className="text-xs text-gray-600">Com conta: progresso salvo na nuvem</p>
-                </>
-              )}
+                )}
+              </div>
             </motion.div>
 
             {/* Sifu quote */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
-              className="mt-10 text-center"
+              transition={{ delay: 1 }}
+              className="text-center"
             >
-              <p className="font-chinese text-parchment-400 text-sm">「千里之行，始于足下」</p>
-              <p className="text-xs text-gray-500 mt-1">Uma jornada de mil li começa com um único passo</p>
-              <p className="text-[10px] text-gray-600 mt-0.5">— 老子 Lǎozǐ</p>
+              <p className="font-chinese text-gi-text-dim text-sm">「千里之行，始于足下」</p>
+              <p className="text-xs text-[#445] mt-1">Uma jornada de mil li começa com um único passo</p>
+              <p className="text-[10px] text-[#334] mt-0.5">— 老子 Lǎozǐ</p>
             </motion.div>
           </motion.div>
         )}
@@ -221,33 +185,37 @@ export default function LandingPage() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="relative z-10 w-full max-w-md px-6"
           >
-            <div className="bg-ink-900/95 border border-gold-700/40 rounded-xl p-8 shadow-2xl">
+            <div className="gi-panel p-8">
+              <div className="gi-corner-tr" /><div className="gi-corner-bl" />
+
               <button
                 onClick={() => setScreen('landing')}
-                className="text-gray-500 hover:text-gray-300 text-sm mb-4 flex items-center gap-1"
+                className="gi-btn text-xs px-3 py-1 mb-5"
               >
                 ← Voltar
               </button>
 
-              <div className="text-center mb-6">
-                <div className="font-chinese text-3xl text-gold-300 mb-1">
+              <div className="text-center mb-5">
+                <div className="font-chinese text-3xl text-gi-geo text-shadow-gold mb-1">
                   {authMode === 'login' ? '登录' : '注册'}
                 </div>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gi-text-dim text-sm">
                   {authMode === 'login' ? 'Entrar na sua conta' : 'Criar nova conta'}
                 </p>
               </div>
 
-              <form onSubmit={handleAuth} className="space-y-4">
+              <div className="gi-divider mb-5" />
+
+              <form onSubmit={handleAuth} className="space-y-3">
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Email"
                   required
-                  className="w-full bg-ink-800 border border-gold-700/30 rounded-lg px-4 py-3
-                             text-white placeholder-gray-500 focus:outline-none focus:border-gold-400
-                             transition-colors"
+                  className="w-full bg-[rgba(5,8,20,0.7)] border border-[rgba(201,168,108,0.2)] rounded px-4 py-3
+                             text-gi-text placeholder-[#445060] focus:outline-none
+                             focus:border-[rgba(201,168,108,0.6)] transition-colors"
                 />
                 <input
                   type="password"
@@ -256,20 +224,17 @@ export default function LandingPage() {
                   placeholder="Senha"
                   required
                   minLength={6}
-                  className="w-full bg-ink-800 border border-gold-700/30 rounded-lg px-4 py-3
-                             text-white placeholder-gray-500 focus:outline-none focus:border-gold-400
-                             transition-colors"
+                  className="w-full bg-[rgba(5,8,20,0.7)] border border-[rgba(201,168,108,0.2)] rounded px-4 py-3
+                             text-gi-text placeholder-[#445060] focus:outline-none
+                             focus:border-[rgba(201,168,108,0.6)] transition-colors"
                 />
-
                 {authError && (
-                  <p className="text-red-400 text-xs text-center">{authError}</p>
+                  <p className="text-crimson-400 text-xs text-center">{authError}</p>
                 )}
-
                 <button
                   type="submit"
                   disabled={authLoading}
-                  className="w-full py-3 bg-gold-700 hover:bg-gold-600 text-white font-bold rounded-lg
-                             transition-colors disabled:opacity-50"
+                  className="gi-btn gi-btn-primary w-full py-3 text-sm disabled:opacity-50"
                 >
                   {authLoading ? '...' : authMode === 'login' ? '登录 Entrar' : '注册 Registrar'}
                 </button>
@@ -278,18 +243,16 @@ export default function LandingPage() {
               <div className="mt-4 text-center">
                 <button
                   onClick={() => setAuthMode(m => m === 'login' ? 'signup' : 'login')}
-                  className="text-xs text-gray-400 hover:text-jade-300 transition-colors"
+                  className="text-xs text-gi-text-dim hover:text-gi-anemo transition-colors"
                 >
-                  {authMode === 'login'
-                    ? 'Não tem conta? Criar agora'
-                    : 'Já tem conta? Entrar'}
+                  {authMode === 'login' ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar'}
                 </button>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-800">
+              <div className="mt-4 pt-4 border-t border-[rgba(201,168,108,0.1)]">
                 <button
                   onClick={continueAsGuest}
-                  className="w-full py-2 text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                  className="w-full py-2 text-xs text-gi-text-dim hover:text-gi-text transition-colors"
                 >
                   Continuar sem conta (progresso local)
                 </button>

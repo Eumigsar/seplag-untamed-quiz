@@ -40,7 +40,6 @@ export default function VocabularyPanel() {
 
   const hskMax = character?.hskLevel ?? 1;
 
-  // Reset selectedHsk if it exceeds the player's current hskMax
   useEffect(() => {
     if (selectedHsk > hskMax) setSelectedHsk(hskMax);
   }, [hskMax]);
@@ -65,20 +64,23 @@ export default function VocabularyPanel() {
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
-      className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-ink-900/98 border-l border-gold-700/40 z-40
-                 flex flex-col shadow-2xl backdrop-blur-sm"
+      transition={{ type: 'spring', damping: 24, stiffness: 260 }}
+      className="fixed right-0 top-0 bottom-0 w-full sm:w-80 z-40 flex flex-col gi-panel-slide-right
+                 bg-[rgba(9,13,34,0.97)] border-l border-[rgba(201,168,108,0.25)] shadow-2xl backdrop-blur-sm"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gold-700/30">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(201,168,108,0.18)]">
         <div>
-          <h2 className="font-chinese text-gold-300 text-lg">词汇库</h2>
-          <p className="text-xs text-gray-400">Vocabulário · {totalLearned} aprendidas · {totalMastered} dominadas</p>
+          <h2 className="font-chinese text-gi-geo text-lg text-shadow-gold">词汇库</h2>
+          <p className="text-[11px] text-gi-text-dim">
+            {totalLearned} aprendidas · {totalMastered} dominadas
+          </p>
         </div>
-        <button onClick={() => setActivePanel('none')} className="text-gray-400 hover:text-white text-xl">✕</button>
+        <button onClick={() => setActivePanel('none')} className="text-gi-text-dim hover:text-gi-text text-lg transition-colors">✕</button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gold-700/20">
+      <div className="flex border-b border-[rgba(201,168,108,0.12)]">
         {(['browse', 'learned', 'review'] as const).map(t => (
           <button
             key={t}
@@ -86,8 +88,8 @@ export default function VocabularyPanel() {
             className={cn(
               'flex-1 py-2 text-xs transition-colors',
               tab === t
-                ? 'text-gold-300 border-b-2 border-gold-500'
-                : 'text-gray-400 hover:text-gray-200',
+                ? 'text-gi-geo border-b-2 border-gi-geo'
+                : 'text-gi-text-dim hover:text-gi-text',
             )}
           >
             {t === 'browse' ? '📚 Explorar' : t === 'learned' ? '✓ Aprendidas' : '🔄 Revisar'}
@@ -96,14 +98,15 @@ export default function VocabularyPanel() {
       </div>
 
       {/* Filters */}
-      <div className="p-3 border-b border-gold-700/20 space-y-2">
+      <div className="px-3 py-2 border-b border-[rgba(201,168,108,0.12)] space-y-2">
         <input
           type="text"
           placeholder="Buscar hanzi, pinyin ou tradução..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full bg-ink-800 border border-gold-700/30 rounded px-3 py-1.5 text-sm text-white
-                     placeholder-gray-500 focus:outline-none focus:border-gold-500"
+          className="w-full bg-[rgba(5,8,20,0.7)] border border-[rgba(201,168,108,0.2)] rounded px-3 py-1.5 text-sm
+                     text-gi-text placeholder-[#445060] focus:outline-none focus:border-[rgba(201,168,108,0.55)]
+                     transition-colors"
         />
         <div className="flex gap-1">
           {[1,2,3,4].map(h => (
@@ -112,12 +115,12 @@ export default function VocabularyPanel() {
               onClick={() => setSelectedHsk(h)}
               disabled={h > hskMax}
               className={cn(
-                'flex-1 text-xs py-1 rounded transition-colors',
+                'flex-1 text-xs py-1 rounded transition-colors border',
                 selectedHsk === h
-                  ? 'bg-gold-600 text-white'
+                  ? 'bg-[rgba(201,168,108,0.18)] border-[rgba(201,168,108,0.7)] text-gi-geo-light'
                   : h > hskMax
-                    ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
-                    : 'bg-ink-800 text-gray-300 hover:bg-ink-700',
+                    ? 'border-[rgba(255,255,255,0.05)] text-[#334] cursor-not-allowed'
+                    : 'border-[rgba(201,168,108,0.15)] text-gi-text-dim hover:border-[rgba(201,168,108,0.4)] hover:text-gi-text',
               )}
             >
               HSK{h}
@@ -127,7 +130,12 @@ export default function VocabularyPanel() {
         <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
           <button
             onClick={() => setSelectedCat('all')}
-            className={cn('text-[10px] px-2 py-0.5 rounded', selectedCat === 'all' ? 'bg-jade-700 text-white' : 'bg-ink-800 text-gray-400')}
+            className={cn(
+              'text-[10px] px-2 py-0.5 rounded border transition-colors',
+              selectedCat === 'all'
+                ? 'bg-[rgba(116,212,168,0.18)] border-[rgba(116,212,168,0.5)] text-gi-anemo'
+                : 'border-[rgba(255,255,255,0.06)] text-gi-text-dim hover:text-gi-text',
+            )}
           >
             Todos
           </button>
@@ -135,7 +143,12 @@ export default function VocabularyPanel() {
             <button
               key={c.key}
               onClick={() => setSelectedCat(c.key)}
-              className={cn('text-[10px] px-2 py-0.5 rounded', selectedCat === c.key ? 'bg-jade-700 text-white' : 'bg-ink-800 text-gray-400')}
+              className={cn(
+                'text-[10px] px-2 py-0.5 rounded border transition-colors',
+                selectedCat === c.key
+                  ? 'bg-[rgba(116,212,168,0.18)] border-[rgba(116,212,168,0.5)] text-gi-anemo'
+                  : 'border-[rgba(255,255,255,0.06)] text-gi-text-dim hover:text-gi-text',
+              )}
             >
               {c.emoji} {c.label}
             </button>
@@ -146,7 +159,7 @@ export default function VocabularyPanel() {
       {/* Word list */}
       <div className="flex-1 overflow-y-auto p-3 space-y-1">
         {filteredWords.length === 0 ? (
-          <p className="text-center text-gray-500 text-sm mt-8">Nenhuma palavra encontrada</p>
+          <p className="text-center text-gi-text-dim text-sm mt-8">Nenhuma palavra encontrada</p>
         ) : (
           filteredWords.map(w => {
             const prog = progress.get(w.id);
@@ -154,20 +167,20 @@ export default function VocabularyPanel() {
               <button
                 key={w.id}
                 onClick={() => setSelectedWord(w)}
-                className="w-full text-left bg-ink-800/60 hover:bg-ink-700/80 border border-transparent
-                           hover:border-gold-700/30 rounded p-2 transition-all flex items-center gap-2"
+                className="w-full text-left gi-panel-inner hover:border-[rgba(201,168,108,0.35)] p-2
+                           transition-all flex items-center gap-2"
               >
-                <span className="font-chinese text-2xl text-gold-300 w-10 shrink-0">{w.hanzi}</span>
+                <span className="font-chinese text-2xl text-gi-geo w-10 shrink-0">{w.hanzi}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-jade-300">{w.pinyin}</div>
-                  <div className="text-xs text-gray-400 truncate">{w.translation}</div>
+                  <div className="text-xs text-gi-anemo">{w.pinyin}</div>
+                  <div className="text-xs text-gi-text-dim truncate">{w.translation}</div>
                 </div>
                 {prog?.mastered ? (
-                  <span className="text-jade-400 text-xs">✓✓</span>
+                  <span className="text-gi-anemo text-xs">✓✓</span>
                 ) : prog?.learned ? (
                   <span className="text-blue-400 text-xs">✓</span>
                 ) : (
-                  <span className="text-gray-600 text-xs">○</span>
+                  <span className="text-[#334] text-xs">○</span>
                 )}
               </button>
             );
@@ -182,12 +195,13 @@ export default function VocabularyPanel() {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="absolute inset-x-0 bottom-0 bg-ink-900 border-t border-gold-600/40 p-4 shadow-2xl"
+            transition={{ type: 'spring', damping: 24, stiffness: 280 }}
+            className="absolute inset-x-0 bottom-0 bg-[rgba(9,13,34,0.98)] border-t border-[rgba(201,168,108,0.3)] p-4 shadow-2xl"
           >
             <VocabularyCard word={selectedWord} />
             <button
               onClick={() => setSelectedWord(null)}
-              className="w-full mt-2 py-1 text-xs text-gray-400 hover:text-white"
+              className="w-full mt-2 py-1 text-xs text-gi-text-dim hover:text-gi-text transition-colors"
             >
               ✕ Fechar
             </button>
