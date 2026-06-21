@@ -1,0 +1,118 @@
+import type { Region } from '@/types';
+
+export const REGIONS: Region[] = [
+  {
+    id: 'bambu-village',
+    name: {
+      hanzi:      '永竹村',
+      pinyin:     'Yǒng Zhú Cūn',
+      portuguese: 'Vila do Bambu Eterno',
+    },
+    description: 'Uma vila serena entre bambus centenários. O ponto de início de toda grande jornada.',
+    hskRequired: 1,
+    theme: 'peaceful-village',
+    bgColor: '#2d5a27',
+    accentColor: '#86efac',
+    mapPosition: { x: 200, y: 400 },
+    connections: ['silk-market', 'lantern-valley'],
+    npcIds: ['sifu-long-yun', 'farmer-liu', 'child-mei'],
+    questIds: ['q001', 'q002', 'q005', 'q006', 'q007', 'q010'],
+    unlocked: true,
+  },
+  {
+    id: 'silk-market',
+    name: {
+      hanzi:      '百绸市场',
+      pinyin:     'Bǎi Chóu Shìchǎng',
+      portuguese: 'Mercado das Cem Sedas',
+    },
+    description: 'Um mercado vibrante dedicado a sedas, tecidos e moda tradicional chinesa.',
+    hskRequired: 1,
+    theme: 'bustling-market',
+    bgColor: '#b45309',
+    accentColor: '#fcd34d',
+    mapPosition: { x: 400, y: 350 },
+    connections: ['bambu-village', 'lantern-valley'],
+    npcIds: ['merchant-wei'],
+    questIds: ['q020', 'q021'],
+    unlocked: true,
+  },
+  {
+    id: 'lantern-valley',
+    name: {
+      hanzi:      '灯笼谷',
+      pinyin:     'Dēnglong Gǔ',
+      portuguese: 'Vale das Lanternas',
+    },
+    description: 'Um vale místico iluminado por lanternas de papel. Festivais e datas especiais são celebrados aqui.',
+    hskRequired: 2,
+    theme: 'festival-valley',
+    bgColor: '#7c3aed',
+    accentColor: '#f59e0b',
+    mapPosition: { x: 300, y: 250 },
+    connections: ['bambu-village', 'silk-market', 'golden-cloud-monastery'],
+    npcIds: [],
+    questIds: [],
+    unlocked: false,
+  },
+  {
+    id: 'golden-cloud-monastery',
+    name: {
+      hanzi:      '金云寺',
+      pinyin:     'Jīn Yún Sì',
+      portuguese: 'Mosteiro da Nuvem Dourada',
+    },
+    description: 'Um antigo mosteiro nas nuvens onde mestres de kung fu ensinam artes marciais e filosofia.',
+    hskRequired: 2,
+    theme: 'shaolin-monastery',
+    bgColor: '#b45309',
+    accentColor: '#fbbf24',
+    mapPosition: { x: 500, y: 200 },
+    connections: ['lantern-valley', 'celestial-dragon-mountains'],
+    npcIds: ['monk-kongxin'],
+    questIds: ['q030', 'q031'],
+    unlocked: false,
+  },
+  {
+    id: 'celestial-dragon-mountains',
+    name: {
+      hanzi:      '天龙山',
+      pinyin:     'Tiān Lóng Shān',
+      portuguese: 'Montanhas dos Dragões Celestes',
+    },
+    description: 'Picos imponentes onde dragões e espíritos habitam. O treinamento mais rigoroso acontece aqui.',
+    hskRequired: 3,
+    theme: 'dragon-mountains',
+    bgColor: '#1e3a5f',
+    accentColor: '#60a5fa',
+    mapPosition: { x: 600, y: 150 },
+    connections: ['golden-cloud-monastery', 'jade-imperial-city'],
+    npcIds: [],
+    questIds: [],
+    unlocked: false,
+  },
+  {
+    id: 'jade-imperial-city',
+    name: {
+      hanzi:      '玉皇城',
+      pinyin:     'Yù Huáng Chéng',
+      portuguese: 'Cidade Imperial de Jade',
+    },
+    description: 'A magnífica capital do Império de Jade. Política, história e filosofia convergem aqui.',
+    hskRequired: 4,
+    theme: 'imperial-palace',
+    bgColor: '#065f46',
+    accentColor: '#34d399',
+    mapPosition: { x: 700, y: 300 },
+    connections: ['celestial-dragon-mountains'],
+    npcIds: ['scholar-zhang'],
+    questIds: ['q040', 'q041', 'q042'],
+    unlocked: false,
+  },
+];
+
+export function getRegionById(id: string): Region | undefined {
+  return REGIONS.find(r => r.id === id);
+}
+
+export const REGION_MAP_SIZE = { width: 900, height: 600 };
