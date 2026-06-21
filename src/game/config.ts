@@ -43,25 +43,29 @@ export const DEPTHS = {
   ui:        100,
 };
 
-export const getPhaserConfig = (parent: string): Types.Core.GameConfig => ({
-  type:   Phaser.AUTO,
-  parent,
-  width:  GAME_WIDTH,
-  height: GAME_HEIGHT,
-  backgroundColor: '#1a1a2e',
-  physics: {
-    default: 'arcade',
-    arcade:  { debug: false, gravity: { x: 0, y: 0 } },
-  },
-  render: {
-    antialias:       false,
-    pixelArt:        true,
-    roundPixels:     true,
-    transparent:     false,
-    clearBeforeRender: true,
-  },
-  scale: {
-    mode:       Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
-});
+export const getPhaserConfig = (parent: string): Types.Core.GameConfig => {
+  const w = typeof window !== 'undefined' ? window.innerWidth : GAME_WIDTH;
+  const h = typeof window !== 'undefined' ? window.innerHeight : GAME_HEIGHT;
+  return {
+    type:   Phaser.AUTO,
+    parent,
+    backgroundColor: '#1a1a2e',
+    physics: {
+      default: 'arcade',
+      arcade:  { debug: false, gravity: { x: 0, y: 0 } },
+    },
+    render: {
+      antialias:         true,
+      pixelArt:          false,
+      roundPixels:       false,
+      transparent:       false,
+      clearBeforeRender: true,
+    },
+    scale: {
+      mode:       Phaser.Scale.RESIZE,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width:      w,
+      height:     h,
+    },
+  };
+};

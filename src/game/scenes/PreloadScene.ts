@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { COLORS, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../config';
+import { COLORS, TILE_SIZE } from '../config';
 
 export default class PreloadScene extends Phaser.Scene {
   private bar!: Phaser.GameObjects.Rectangle;
   private barBg!: Phaser.GameObjects.Rectangle;
   private text!: Phaser.GameObjects.Text;
+  private loadBarW = 400;
 
   constructor() { super({ key: 'PreloadScene' }); }
 
@@ -15,46 +16,32 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   private createLoadingUI() {
-    const cx = GAME_WIDTH / 2;
-    const cy = GAME_HEIGHT / 2;
+    const cx = this.scale.width / 2;
+    const cy = this.scale.height / 2;
+    this.loadBarW = Math.min(360, this.scale.width - 60);
 
-    // Background
-    this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, 0x1a1a2e);
+    this.add.rectangle(cx, cy, this.scale.width, this.scale.height, 0x1a1a2e);
 
-    // Title
     this.add.text(cx, cy - 100, '龙玉传说', {
-      fontSize: '48px',
-      color: '#f59e0b',
-      fontFamily: 'serif',
-      stroke: '#78350f',
-      strokeThickness: 3,
+      fontSize: '48px', color: '#f59e0b',
+      fontFamily: 'serif', stroke: '#78350f', strokeThickness: 3,
     }).setOrigin(0.5);
 
     this.add.text(cx, cy - 50, 'A Lenda do Dragão de Jade', {
-      fontSize: '18px',
-      color: '#d4a657',
-      fontFamily: 'serif',
+      fontSize: '18px', color: '#d4a657', fontFamily: 'serif',
     }).setOrigin(0.5);
 
-    // Loading bar background
-    this.barBg = this.add.rectangle(cx, cy + 20, 400, 16, 0x2d2d4e);
-
-    // Loading bar fill
-    this.bar = this.add.rectangle(cx - 198, cy + 20, 2, 12, COLORS.ui_gold);
+    this.barBg = this.add.rectangle(cx, cy + 20, this.loadBarW, 16, 0x2d2d4e);
+    this.bar   = this.add.rectangle(cx - this.loadBarW / 2 + 2, cy + 20, 2, 12, COLORS.ui_gold);
     this.bar.setOrigin(0, 0.5);
 
-    // Loading text
     this.text = this.add.text(cx, cy + 50, '加载中... Carregando...', {
-      fontSize: '14px',
-      color: '#a0a0c0',
-      fontFamily: 'sans-serif',
+      fontSize: '14px', color: '#a0a0c0', fontFamily: 'sans-serif',
     }).setOrigin(0.5);
   }
 
   private createGameTextures() {
-    // Player sprites (male & female) — 16x32 pixel art
-    this.createPlayerSprite('player-m', 0x4a90d9, 0xf5deb3);
-    this.createPlayerSprite('player-f', 0xe91e8c, 0xf5deb3);
+    this.loadPlayerSVGs();
 
     // NPC sprites
     this.createNPCSprite('npc-sifu',     COLORS.building);
@@ -79,94 +66,70 @@ export default class PreloadScene extends Phaser.Scene {
     // Objects
     this.createBambooSprite();
     this.createTreeSprite();
-    this.createBuildingSprite('building-house', 0x8b4513, 0xc0392b);
-    this.createBuildingSprite('building-temple', 0x9a1020, 0xfbbf24);
-    this.createBuildingSprite('building-market', 0xb45309, 0xf59e0b);
+    this.createBuildingSprite('building-house',   0x8b4513, 0xc0392b);
+    this.createBuildingSprite('building-temple',  0x9a1020, 0xfbbf24);
+    this.createBuildingSprite('building-market',  0xb45309, 0xf59e0b);
     this.createChestSprite();
     this.createPortalSprite();
 
     // Enemy sprites
-    this.createEnemySprite('enemy-bandit',        0x4a1942);
-    this.createEnemySprite('enemy-monk',           0x1a1a2e);
-    this.createEnemySprite('enemy-guard',          0x1e3a5f);
-    this.createEnemySprite('enemy-dragon-spirit',  0x065f46);
-    this.createEnemySprite('enemy-dummy',          0x8B4513);
+    this.createEnemySprite('enemy-bandit',       0x4a1942);
+    this.createEnemySprite('enemy-monk',          0x1a1a2e);
+    this.createEnemySprite('enemy-guard',         0x1e3a5f);
+    this.createEnemySprite('enemy-dragon-spirit', 0x065f46);
+    this.createEnemySprite('enemy-dummy',         0x8B4513);
 
-    // UI elements
     this.createHPBarTextures();
   }
 
-  private createPlayerSprite(key: string, outfitColor: number, skinColor: number) {
-    const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
-    const w = 16, h = 32;
+  // ─── Player sprites (SVG) ───────────────────────────────────────────────────
 
-    // Feet
-    gfx.fillStyle(0x333333);
-    gfx.fillRect(2, 28, 4, 4);
-    gfx.fillRect(10, 28, 4, 4);
+  private loadPlayerSVGs() {
+    const outfits = [
+      'shaolin-monk', 'silk-merchant', 'wandering-warrior',
+      'jade-scholar', 'imperial-guard', 'taoist-hermit',
+    ];
+    // SVG loaded at 2× (128×256) for crisp display at 64×128 on retina
+    const svgOpts = { width: 128, height: 256 };
 
-    // Body/outfit
-    gfx.fillStyle(outfitColor);
-    gfx.fillRect(3, 16, 10, 12);
+    this.load.svg('player-m', '/sprites/player-m.svg', svgOpts);
+    this.load.svg('player-f', '/sprites/player-f.svg', svgOpts);
 
-    // Arms
-    gfx.fillStyle(outfitColor);
-    gfx.fillRect(0, 17, 3, 8);
-    gfx.fillRect(13, 17, 3, 8);
-
-    // Head/neck
-    gfx.fillStyle(skinColor);
-    gfx.fillRect(4, 4, 8, 8);
-
-    // Hair
-    gfx.fillStyle(0x1a0a00);
-    gfx.fillRect(3, 3, 10, 3);
-
-    // Eyes
-    gfx.fillStyle(0x1a1a1a);
-    gfx.fillRect(6, 8, 2, 2);
-    gfx.fillRect(10, 8, 2, 2);
-
-    // Belt
-    gfx.fillStyle(0x78350f);
-    gfx.fillRect(3, 24, 10, 2);
-
-    gfx.generateTexture(key, w, h);
-    gfx.destroy();
+    for (const g of ['m', 'f']) {
+      for (const outfit of outfits) {
+        this.load.svg(`player-${g}-${outfit}`, `/sprites/player-${g}-${outfit}.svg`, svgOpts);
+      }
+    }
   }
+
+  // ─── NPC ────────────────────────────────────────────────────────────────────
 
   private createNPCSprite(key: string, color: number) {
     const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
-    // Feet
     gfx.fillStyle(0x333333);
     gfx.fillRect(3, 28, 3, 4);
     gfx.fillRect(10, 28, 3, 4);
-    // Body
     gfx.fillStyle(color);
     gfx.fillRect(4, 16, 8, 12);
-    // Head
     gfx.fillStyle(0xf5deb3);
     gfx.fillRect(5, 5, 6, 8);
-    // Hair
     gfx.fillStyle(0x111111);
     gfx.fillRect(5, 3, 6, 3);
-    // Eyes
-    gfx.fillStyle(0x111111);
     gfx.fillRect(6, 9, 1, 1);
     gfx.fillRect(9, 9, 1, 1);
-    // Belt
     gfx.fillStyle(0x422006);
     gfx.fillRect(4, 24, 8, 2);
     gfx.generateTexture(key, 16, 32);
     gfx.destroy();
   }
 
+  // ─── Tiles ──────────────────────────────────────────────────────────────────
+
   private createTile(key: string, base: number, shadow: number) {
     const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
     const s = TILE_SIZE;
     gfx.fillStyle(base);
     gfx.fillRect(0, 0, s, s);
-    // Subtle grid shading
     gfx.fillStyle(shadow, 0.3);
     gfx.fillRect(0, s - 2, s, 2);
     gfx.fillRect(s - 2, 0, 2, s);
@@ -174,17 +137,16 @@ export default class PreloadScene extends Phaser.Scene {
     gfx.destroy();
   }
 
+  // ─── Objects ────────────────────────────────────────────────────────────────
+
   private createBambooSprite() {
     const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
-    // Stem
     gfx.fillStyle(0x4a7c59);
     gfx.fillRect(6, 0, 4, 48);
-    // Nodes
     gfx.fillStyle(0x3d6b48);
     gfx.fillRect(5, 10, 6, 3);
     gfx.fillRect(5, 22, 6, 3);
     gfx.fillRect(5, 34, 6, 3);
-    // Leaves
     gfx.fillStyle(0x86efac);
     gfx.fillRect(10, 8, 8, 3);
     gfx.fillRect(2, 20, 8, 3);
@@ -195,10 +157,8 @@ export default class PreloadScene extends Phaser.Scene {
 
   private createTreeSprite() {
     const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
-    // Trunk
     gfx.fillStyle(0x92400e);
     gfx.fillRect(11, 28, 6, 16);
-    // Canopy layers
     gfx.fillStyle(0x166534);
     gfx.fillRect(4, 16, 20, 14);
     gfx.fillStyle(0x15803d);
@@ -211,21 +171,16 @@ export default class PreloadScene extends Phaser.Scene {
 
   private createBuildingSprite(key: string, wallColor: number, roofColor: number) {
     const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
-    // Walls
     gfx.fillStyle(wallColor);
     gfx.fillRect(4, 20, 56, 36);
-    // Roof
     gfx.fillStyle(roofColor);
     gfx.fillRect(0, 8, 64, 16);
     gfx.fillRect(6, 0, 52, 12);
-    // Door
     gfx.fillStyle(0x422006);
     gfx.fillRect(22, 36, 20, 20);
-    // Windows
     gfx.fillStyle(0xfef3c7, 0.7);
     gfx.fillRect(8, 24, 12, 10);
     gfx.fillRect(44, 24, 12, 10);
-    // Roof trim
     gfx.fillStyle(0xf59e0b);
     gfx.fillRect(0, 7, 64, 3);
     gfx.generateTexture(key, 64, 56);
@@ -291,9 +246,11 @@ export default class PreloadScene extends Phaser.Scene {
     gfx.destroy();
   }
 
+  // ─── Load events ────────────────────────────────────────────────────────────
+
   private setupLoadEvents() {
     this.load.on('progress', (p: number) => {
-      this.bar.width = 396 * p;
+      this.bar.width = (this.loadBarW - 4) * p;
       this.text.setText(`加载中... ${Math.floor(p * 100)}%`);
     });
     this.load.on('complete', () => {
