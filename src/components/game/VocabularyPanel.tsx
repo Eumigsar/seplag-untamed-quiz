@@ -65,7 +65,7 @@ export default function VocabularyPanel() {
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
-      className="fixed right-0 top-0 bottom-0 w-80 bg-ink-900/98 border-l border-gold-700/40 z-40
+      className="fixed right-0 top-0 bottom-0 w-full sm:w-80 bg-ink-900/98 border-l border-gold-700/40 z-40
                  flex flex-col shadow-2xl backdrop-blur-sm"
     >
       {/* Header */}

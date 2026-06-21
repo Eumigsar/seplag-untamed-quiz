@@ -102,7 +102,8 @@ export default function SifuDialog({ npc, onClose, onQuestGiven, onWordLearned, 
 
         {/* Dialog box */}
         <motion.div
-          className="relative w-full max-w-2xl mb-6 mx-4 pointer-events-auto"
+          className="relative w-full max-w-2xl mx-4 pointer-events-auto"
+          style={{ marginBottom: 'max(1.5rem, env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}

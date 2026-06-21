@@ -61,7 +61,7 @@ export default function HUD() {
   const panelBtn = (label: string, icon: string, panel: ActivePanel, badge?: number) => (
     <button
       onClick={() => togglePanel(panel)}
-      className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded text-xs transition-all
+      className={`relative flex flex-col items-center gap-0.5 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs transition-all
         ${activePanel === panel
           ? 'bg-gold-600/80 text-white border border-gold-400'
           : 'bg-ink-800/90 text-gray-300 border border-gold-800/40 hover:border-gold-600/60 hover:text-white'}`}
@@ -79,7 +79,8 @@ export default function HUD() {
   return (
     <>
       {/* Top-left: Character stats */}
-      <div className="fixed top-3 left-3 z-40 w-52 bg-ink-900/90 border border-gold-700/40 rounded-lg p-3 shadow-xl backdrop-blur-sm">
+      <div className="fixed top-3 left-3 z-40 w-36 sm:w-52 bg-ink-900/90 border border-gold-700/40 rounded-lg p-2 sm:p-3 shadow-xl backdrop-blur-sm"
+        style={{ top: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}>
         {/* Name & Level */}
         <div className="flex items-center justify-between mb-2">
           <span className="font-chinese text-gold-300 font-bold text-sm truncate">{character.nickname}</span>
@@ -107,7 +108,8 @@ export default function HUD() {
       </div>
 
       {/* Top-right: Time, weather, date */}
-      <div className="fixed top-3 right-3 z-40 bg-ink-900/90 border border-gold-700/40 rounded-lg p-3 shadow-xl backdrop-blur-sm text-right">
+      <div className="fixed top-3 right-3 z-40 bg-ink-900/90 border border-gold-700/40 rounded-lg p-2 sm:p-3 shadow-xl backdrop-blur-sm text-right"
+        style={{ top: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}>
         <div className="text-gold-300 font-chinese text-sm">
           {getWeatherEmoji(weather)} {weatherInfo?.hanzi ?? ''}
         </div>
@@ -154,9 +156,9 @@ export default function HUD() {
         </div>
       )}
 
-      {/* Bottom action bar */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-        <div className="flex gap-1.5 bg-ink-900/95 border border-gold-700/40 rounded-xl p-2 shadow-2xl backdrop-blur-sm">
+      {/* Bottom action bar — padded for iOS home indicator */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+        <div className="flex gap-1 sm:gap-1.5 bg-ink-900/95 border border-gold-700/40 rounded-xl p-1.5 sm:p-2 shadow-2xl backdrop-blur-sm">
           {panelBtn('师父', '🧙', 'sifu')}
           {panelBtn('任务', '📋', 'quest-log', activeQuestCount)}
           {panelBtn('词汇', '📖', 'vocabulary')}
