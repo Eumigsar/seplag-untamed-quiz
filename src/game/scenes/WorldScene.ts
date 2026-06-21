@@ -44,11 +44,15 @@ export default class WorldScene extends Phaser.Scene {
   private tileMap?: TileMap;
   private playerName = 'Player';
   private playerGender: 'male' | 'female' = 'male';
-  private virtualInput = { x: 0, y: 0 };
-  private onVirtualInput = (e: Event) => {
-    const { x, y } = (e as CustomEvent<{ x: number; y: number }>).detail;
-    this.virtualInput = { x, y };
-  };
+  private playerOutfit = '';
+
+  // Mobile joystick
+  private isMobile = false;
+  private touchJoy = { dx: 0, dy: 0, active: false, pid: -1 };
+  private joyGraphics?: Phaser.GameObjects.Graphics;
+  private readonly JOY_R = 52;
+  private readonly NUB_R = 22;
+  private nearestNPCId: string | null = null;
   private initCallbacks?: {
     onNPCInteract?: (npcId: string) => void;
     onRegionChange?: (region: RegionId) => void;
@@ -69,13 +73,14 @@ export default class WorldScene extends Phaser.Scene {
     if (data.playerName)   this.playerName    = data.playerName;
     if (data.playerGender) this.playerGender  = data.playerGender as 'male' | 'female';
     // Fall back to localStorage so the player's nickname shows in-world
-    if (this.playerName === 'Player' && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('seplag_character');
         if (saved) {
-          const char = JSON.parse(saved) as { nickname?: string; gender?: string };
-          if (char.nickname) this.playerName = char.nickname;
+          const char = JSON.parse(saved) as { nickname?: string; gender?: string; startingOutfit?: string };
+          if (char.nickname && this.playerName === 'Player') this.playerName = char.nickname;
           if (char.gender === 'female') this.playerGender = 'female';
+          if (char.startingOutfit) this.playerOutfit = char.startingOutfit;
         }
       } catch { /* ignore */ }
     }
@@ -88,6 +93,7 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   create() {
+    this.isMobile = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
     this.buildMap();
     this.createPlayer();
     this.createNPCs();
@@ -96,9 +102,6 @@ export default class WorldScene extends Phaser.Scene {
     this.createWeatherOverlay();
     this.addRegionLabel();
     this.events.on('shutdown', this.cleanup, this);
-    if (typeof window !== 'undefined') {
-      window.addEventListener('phaser-virtual-input', this.onVirtualInput);
-    }
   }
 
   // ─── Map Building ──────────────────────────────────────────────────────────
@@ -278,6 +281,18 @@ export default class WorldScene extends Phaser.Scene {
 
   // ─── Player ────────────────────────────────────────────────────────────────
 
+  private outfitTint(outfit: string): number {
+    const map: Record<string, number> = {
+      'shaolin-monk':       0xf97316,
+      'silk-merchant':      0xa855f7,
+      'wandering-warrior':  0x64748b,
+      'jade-scholar':       0x22c55e,
+      'imperial-guard':     0xef4444,
+      'taoist-hermit':      0xe2e8f0,
+    };
+    return map[outfit] ?? 0xffffff;
+  }
+
   private createPlayer() {
     const spriteKey = this.playerGender === 'female' ? 'player-f' : 'player-m';
     this.player = this.physics.add.sprite(
@@ -285,6 +300,7 @@ export default class WorldScene extends Phaser.Scene {
       GAME_HEIGHT / 2,
       spriteKey,
     ).setDepth(DEPTHS.player);
+    if (this.playerOutfit) this.player.setTint(this.outfitTint(this.playerOutfit));
     this.player.setCollideWorldBounds(true);
     this.player.body.setSize(12, 16);
     this.player.body.setOffset(2, 14);
@@ -358,6 +374,9 @@ export default class WorldScene extends Phaser.Scene {
 
   // ─── Input ─────────────────────────────────────────────────────────────────
 
+  private get joyX() { return 80; }
+  private get joyY() { return this.scale.height - 90; }
+
   private setupInput() {
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.wasd = {
@@ -368,24 +387,99 @@ export default class WorldScene extends Phaser.Scene {
     };
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    // Mouse click to interact with NPCs
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      const worldX = pointer.worldX;
-      const worldY = pointer.worldY;
+    if (this.isMobile) {
+      this.initMobileJoystick();
+    }
+
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      if (this.isMobile) {
+        const dist = Math.hypot(p.x - this.joyX, p.y - this.joyY);
+        if (!this.touchJoy.active && dist < this.JOY_R + 28) {
+          this.touchJoy = { dx: 0, dy: 0, active: true, pid: p.id };
+          return;
+        }
+        // Tap on nearest visible NPC (right zone) or tap near indicator
+        if (this.nearestNPCId) {
+          this.interactWithNPC(this.nearestNPCId);
+          return;
+        }
+      }
+      // Desktop: click on NPC sprite
+      const { worldX, worldY } = p;
       this.npcSprites.forEach((sprite, npcId) => {
-        const dist = Phaser.Math.Distance.Between(worldX, worldY, sprite.x, sprite.y);
-        if (dist < 40) this.interactWithNPC(npcId);
+        if (Phaser.Math.Distance.Between(worldX, worldY, sprite.x, sprite.y) < 80) {
+          this.interactWithNPC(npcId);
+        }
       });
     });
+
+    if (this.isMobile) {
+      this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+        if (p.id !== this.touchJoy.pid || !this.touchJoy.active) return;
+        const dx = p.x - this.joyX;
+        const dy = p.y - this.joyY;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 6) { this.touchJoy.dx = 0; this.touchJoy.dy = 0; this.renderJoystick(0, 0); return; }
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const clamped = Math.min(dist, this.JOY_R);
+        this.touchJoy.dx = nx;
+        this.touchJoy.dy = ny;
+        this.renderJoystick(nx * clamped / this.JOY_R, ny * clamped / this.JOY_R);
+      });
+
+      const stopJoy = (p: Phaser.Input.Pointer) => {
+        if (p.id === this.touchJoy.pid) {
+          this.touchJoy = { dx: 0, dy: 0, active: false, pid: -1 };
+          this.renderJoystick(0, 0);
+        }
+      };
+      this.input.on('pointerup', stopJoy);
+      this.input.on('pointercancel', stopJoy);
+    }
+  }
+
+  private initMobileJoystick() {
+    this.joyGraphics = this.add.graphics().setScrollFactor(0).setDepth(DEPTHS.ui + 20);
+    this.renderJoystick(0, 0);
+  }
+
+  private renderJoystick(ndx: number, ndy: number) {
+    if (!this.joyGraphics) return;
+    const jx = this.joyX;
+    const jy = this.joyY;
+    this.joyGraphics.clear();
+    // Outer ring
+    this.joyGraphics.fillStyle(0x0a0d12, 0.45);
+    this.joyGraphics.fillCircle(jx, jy, this.JOY_R);
+    this.joyGraphics.lineStyle(2, 0xf59e0b, 0.55);
+    this.joyGraphics.strokeCircle(jx, jy, this.JOY_R);
+    // Cardinal dots
+    [0, 90, 180, 270].forEach(deg => {
+      const rad = (deg * Math.PI) / 180;
+      this.joyGraphics!.fillStyle(0xf59e0b, 0.35);
+      this.joyGraphics!.fillCircle(
+        jx + Math.cos(rad) * (this.JOY_R - 10),
+        jy + Math.sin(rad) * (this.JOY_R - 10),
+        3,
+      );
+    });
+    // Nub
+    const nx = jx + ndx * this.JOY_R;
+    const ny = jy + ndy * this.JOY_R;
+    this.joyGraphics.fillStyle(0xf59e0b, 0.9);
+    this.joyGraphics.fillCircle(nx, ny, this.NUB_R);
+    this.joyGraphics.lineStyle(1.5, 0xfef3c7, 0.6);
+    this.joyGraphics.strokeCircle(nx, ny, this.NUB_R);
   }
 
   // ─── Weather ───────────────────────────────────────────────────────────────
 
   private createWeatherOverlay() {
+    const w = this.scale.width;
+    const h = this.scale.height;
     this.weatherOverlay = this.add.rectangle(
-      GAME_WIDTH / 2, GAME_HEIGHT / 2,
-      GAME_WIDTH, GAME_HEIGHT,
-      0x000000, 0,
+      w / 2, h / 2, w, h, 0x000000, 0,
     ).setDepth(DEPTHS.particles).setScrollFactor(0);
   }
 
@@ -417,52 +511,54 @@ export default class WorldScene extends Phaser.Scene {
   }
 
   private createRainEffect() {
+    const sw = this.scale.width; const sh = this.scale.height;
     for (let i = 0; i < 40; i++) {
       const drop = this.add.text(
-        Math.random() * GAME_WIDTH,
-        Math.random() * GAME_HEIGHT,
+        Math.random() * sw, Math.random() * sh,
         '|', { fontSize: '10px', color: '#a0c0ff' },
       ).setDepth(DEPTHS.particles).setScrollFactor(0).setAlpha(0.5);
       this.weatherParticles.push(drop);
       this.tweens.add({
-        targets: drop, y: GAME_HEIGHT + 20,
+        targets: drop, y: sh + 20,
         duration: 600 + Math.random() * 300,
-        onComplete: () => { drop.y = -10; drop.x = Math.random() * GAME_WIDTH; },
+        onComplete: () => { drop.y = -10; drop.x = Math.random() * sw; },
         repeat: -1,
       });
     }
   }
 
   private createSnowEffect() {
+    const sw = this.scale.width; const sh = this.scale.height;
     for (let i = 0; i < 30; i++) {
       const flake = this.add.text(
-        Math.random() * GAME_WIDTH, Math.random() * GAME_HEIGHT,
+        Math.random() * sw, Math.random() * sh,
         '❄', { fontSize: '12px', color: '#e0f0ff' },
       ).setDepth(DEPTHS.particles).setScrollFactor(0).setAlpha(0.7);
       this.weatherParticles.push(flake);
       this.tweens.add({
-        targets: flake, y: GAME_HEIGHT + 20, x: `+=${Math.random() * 60 - 30}`,
+        targets: flake, y: sh + 20, x: `+=${Math.random() * 60 - 30}`,
         duration: 2000 + Math.random() * 1000,
-        onComplete: () => { flake.y = -20; flake.x = Math.random() * GAME_WIDTH; },
+        onComplete: () => { flake.y = -20; flake.x = Math.random() * sw; },
         repeat: -1,
       });
     }
   }
 
   private createPetalEffect() {
+    const sw = this.scale.width; const sh = this.scale.height;
     const petals = ['🌸', '🌺', '🌼'];
     for (let i = 0; i < 15; i++) {
       const petal = this.add.text(
-        Math.random() * GAME_WIDTH, -20,
+        Math.random() * sw, -20,
         petals[Math.floor(Math.random() * petals.length)],
         { fontSize: '14px' },
       ).setDepth(DEPTHS.particles).setScrollFactor(0);
       this.weatherParticles.push(petal);
       this.tweens.add({
         targets: petal,
-        y: GAME_HEIGHT + 30, x: `+=${Math.random() * 100 - 50}`,
+        y: sh + 30, x: `+=${Math.random() * 100 - 50}`,
         duration: 3000 + Math.random() * 2000, delay: Math.random() * 3000,
-        onComplete: () => { petal.y = -20; petal.x = Math.random() * GAME_WIDTH; },
+        onComplete: () => { petal.y = -20; petal.x = Math.random() * sw; },
         repeat: -1,
       });
     }
@@ -473,7 +569,7 @@ export default class WorldScene extends Phaser.Scene {
   private addRegionLabel() {
     const region = REGIONS.find(r => r.id === this.currentRegion);
     if (!region) return;
-    const label = this.add.text(GAME_WIDTH / 2, 30,
+    const label = this.add.text(this.scale.width / 2, 30,
       `${region.name.hanzi}  ${region.name.pinyin}`, {
         fontSize: '14px', color: '#f59e0b',
         backgroundColor: '#00000090',
@@ -493,7 +589,8 @@ export default class WorldScene extends Phaser.Scene {
     const sprite = this.npcSprites.get(npcId);
     if (!sprite) return;
     const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, sprite.x, sprite.y);
-    if (dist > 80) {
+    const maxDist = this.isMobile ? 120 : 80;
+    if (dist > maxDist) {
       this.onNotify?.('Chegue mais perto!', '靠近', 'kào jìn');
       return;
     }
@@ -526,10 +623,10 @@ export default class WorldScene extends Phaser.Scene {
     if (this.cursors.up.isDown    || this.wasd.W.isDown) vel.y = -speed;
     if (this.cursors.down.isDown  || this.wasd.S.isDown) vel.y =  speed;
 
-    // Virtual joystick input (mobile)
-    if (vel.x === 0 && vel.y === 0 && (this.virtualInput.x !== 0 || this.virtualInput.y !== 0)) {
-      vel.x = this.virtualInput.x * speed;
-      vel.y = this.virtualInput.y * speed;
+    // Touch joystick input (mobile)
+    if (vel.x === 0 && vel.y === 0 && this.touchJoy.active) {
+      vel.x = this.touchJoy.dx * speed;
+      vel.y = this.touchJoy.dy * speed;
     }
 
     if (vel.x !== 0 && vel.y !== 0) {
@@ -546,15 +643,15 @@ export default class WorldScene extends Phaser.Scene {
 
   private checkNPCProximity() {
     let nearestNPC: string | null = null;
-    let nearestDist = 60;
+    let nearestDist = 80;
     this.npcSprites.forEach((sprite, npcId) => {
       const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, sprite.x, sprite.y);
       if (d < nearestDist) { nearestDist = d; nearestNPC = npcId; }
     });
+    this.nearestNPCId = nearestNPC;
     if (nearestNPC) {
       if (!this.interactIndicator) {
-        const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
-        const hint = isTouchDevice ? '👆 对话' : '[E] 对话';
+        const hint = this.isMobile ? '👆 对话' : '[E] 对话';
         this.interactIndicator = this.add.text(0, 0, hint, {
           fontSize: '10px', color: '#fef3c7',
           backgroundColor: '#1a1a2e90',
@@ -562,7 +659,7 @@ export default class WorldScene extends Phaser.Scene {
         }).setDepth(DEPTHS.ui);
       }
       this.interactIndicator.setPosition(this.player.x - 20, this.player.y - 40);
-      if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+      if (!this.isMobile && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
         this.interactWithNPC(nearestNPC);
       }
     } else {
@@ -579,8 +676,6 @@ export default class WorldScene extends Phaser.Scene {
 
   private cleanup() {
     this.weatherParticles.forEach(p => p.destroy());
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('phaser-virtual-input', this.onVirtualInput);
-    }
+    this.joyGraphics?.destroy();
   }
 }

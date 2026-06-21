@@ -123,8 +123,8 @@ export default function HUD() {
 
       {/* Focus widget — next objective or quest suggestion */}
       {(focusObj || suggestQuest) && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 max-w-xs w-full px-3">
-          <div className={`rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm border
+        <div className="fixed top-20 sm:top-3 left-1/2 -translate-x-1/2 z-40 max-w-[220px] sm:max-w-xs w-full px-2 sm:px-3">
+          <div className={`rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-xl backdrop-blur-sm border
             ${focusObj
               ? 'bg-gold-900/90 border-gold-600/60'
               : 'bg-ink-900/90 border-jade-700/50'}`}
@@ -157,22 +157,25 @@ export default function HUD() {
       )}
 
       {/* Bottom action bar — padded for iOS home indicator */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
-        <div className="flex gap-1 sm:gap-1.5 bg-ink-900/95 border border-gold-700/40 rounded-xl p-1.5 sm:p-2 shadow-2xl backdrop-blur-sm">
-          {panelBtn('师父', '🧙', 'sifu')}
-          {panelBtn('任务', '📋', 'quest-log', activeQuestCount)}
-          {panelBtn('词汇', '📖', 'vocabulary')}
-          {panelBtn('背包', '🎒', 'inventory')}
-          {panelBtn('地图', '🗺️', 'map')}
-          {panelBtn('成就', '🏆', 'achievements')}
-          {panelBtn('历法', '📅', 'calendar')}
-        </div>
-        {/* Session timer — subtle indicator */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col items-center" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
+        {/* Session timer */}
         {sessionMins > 0 && (
-          <div className="text-center mt-1 text-[10px] text-gray-600">
+          <div className="text-center mb-1 text-[10px] text-gray-500">
             ⏱ {sessionMins} min de treino
           </div>
         )}
+        {/* On mobile, push bar to the right so joystick (bottom-left) has space */}
+        <div className="flex justify-end sm:justify-center w-full pr-2 sm:pr-0">
+          <div className="flex gap-0.5 sm:gap-1.5 bg-ink-900/95 border border-gold-700/40 rounded-xl p-1 sm:p-2 shadow-2xl backdrop-blur-sm">
+            {panelBtn('师父', '🧙', 'sifu')}
+            {panelBtn('任务', '📋', 'quest-log', activeQuestCount)}
+            {panelBtn('词汇', '📖', 'vocabulary')}
+            {panelBtn('背包', '🎒', 'inventory')}
+            {panelBtn('地图', '🗺️', 'map')}
+            {panelBtn('成就', '🏆', 'achievements')}
+            {panelBtn('历法', '📅', 'calendar')}
+          </div>
+        </div>
       </div>
 
       {/* Vocabulary mastered indicator */}

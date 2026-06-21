@@ -61,7 +61,7 @@ export const getPhaserConfig = (parent: string): Types.Core.GameConfig => ({
     clearBeforeRender: true,
   },
   scale: {
-    mode:       Phaser.Scale.FIT,
+    mode:       Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
 });
