@@ -17,6 +17,7 @@ interface PlayerStore {
   character:   PlayerCharacter | null;
   isLoading:   boolean;
 
+  hydrate:        () => void;
   createCharacter: (params: CreateCharacterParams) => void;
   setCharacter:   (c: PlayerCharacter) => void;
   clearCharacter: () => void;
@@ -55,6 +56,17 @@ const DEFAULT_STATS: PlayerStats = {
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
   character: null,
   isLoading: false,
+
+  hydrate: () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('seplag_character');
+      if (raw) {
+        const c = JSON.parse(raw) as PlayerCharacter;
+        if (c?.id) set({ character: c });
+      }
+    } catch { /* ignore malformed data */ }
+  },
 
   createCharacter: ({ nickname, gender, appearance, startingOutfit }) => {
     const character: PlayerCharacter = {
