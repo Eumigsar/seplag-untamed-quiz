@@ -16,6 +16,7 @@ import Inventory from '@/components/game/Inventory';
 import AchievementsPanel from '@/components/game/AchievementsPanel';
 import CalendarWidget from '@/components/game/CalendarWidget';
 import MapPanel from '@/components/game/MapPanel';
+import VirtualDPad from '@/components/game/VirtualDPad';
 
 // Phaser must be loaded client-side only (no SSR)
 const GameCanvas = dynamic(() => import('@/components/game/GameCanvas'), {
@@ -115,7 +116,7 @@ export default function GamePage() {
   };
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-ink-950 relative">
+    <div className="w-screen overflow-hidden bg-ink-950 relative" style={{ height: '100dvh' }}>
       {/* Phaser game canvas — full screen */}
       <div className="absolute inset-0">
         <GameCanvas />
@@ -123,6 +124,9 @@ export default function GamePage() {
 
       {/* React HUD layer — always visible */}
       <HUD />
+
+      {/* Virtual joystick — only rendered on touch devices */}
+      <VirtualDPad />
 
       {/* Dialogue overlay */}
       <AnimatePresence>

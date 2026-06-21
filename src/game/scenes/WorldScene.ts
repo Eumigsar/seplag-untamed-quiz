@@ -44,6 +44,11 @@ export default class WorldScene extends Phaser.Scene {
   private tileMap?: TileMap;
   private playerName = 'Player';
   private playerGender: 'male' | 'female' = 'male';
+  private virtualInput = { x: 0, y: 0 };
+  private onVirtualInput = (e: Event) => {
+    const { x, y } = (e as CustomEvent<{ x: number; y: number }>).detail;
+    this.virtualInput = { x, y };
+  };
   private initCallbacks?: {
     onNPCInteract?: (npcId: string) => void;
     onRegionChange?: (region: RegionId) => void;
@@ -91,6 +96,9 @@ export default class WorldScene extends Phaser.Scene {
     this.createWeatherOverlay();
     this.addRegionLabel();
     this.events.on('shutdown', this.cleanup, this);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('phaser-virtual-input', this.onVirtualInput);
+    }
   }
 
   // ─── Map Building ──────────────────────────────────────────────────────────
@@ -518,6 +526,12 @@ export default class WorldScene extends Phaser.Scene {
     if (this.cursors.up.isDown    || this.wasd.W.isDown) vel.y = -speed;
     if (this.cursors.down.isDown  || this.wasd.S.isDown) vel.y =  speed;
 
+    // Virtual joystick input (mobile)
+    if (vel.x === 0 && vel.y === 0 && (this.virtualInput.x !== 0 || this.virtualInput.y !== 0)) {
+      vel.x = this.virtualInput.x * speed;
+      vel.y = this.virtualInput.y * speed;
+    }
+
     if (vel.x !== 0 && vel.y !== 0) {
       vel.x *= 0.707;
       vel.y *= 0.707;
@@ -539,7 +553,9 @@ export default class WorldScene extends Phaser.Scene {
     });
     if (nearestNPC) {
       if (!this.interactIndicator) {
-        this.interactIndicator = this.add.text(0, 0, '[E] 对话', {
+        const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+        const hint = isTouchDevice ? '👆 对话' : '[E] 对话';
+        this.interactIndicator = this.add.text(0, 0, hint, {
           fontSize: '10px', color: '#fef3c7',
           backgroundColor: '#1a1a2e90',
           padding: { x: 4, y: 2 },
@@ -563,5 +579,8 @@ export default class WorldScene extends Phaser.Scene {
 
   private cleanup() {
     this.weatherParticles.forEach(p => p.destroy());
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('phaser-virtual-input', this.onVirtualInput);
+    }
   }
 }
