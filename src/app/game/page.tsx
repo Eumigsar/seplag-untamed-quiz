@@ -40,13 +40,22 @@ export default function GamePage() {
     tickTime, generateWeather,
   } = useGameStore();
 
-  const { character, gainXP } = usePlayerStore();
+  const { character, gainXP, hydrate } = usePlayerStore();
   const { markSeen, learnWord } = useVocabularyStore();
 
-  // Redirect if no character
+  // Hydrate from localStorage, then redirect if still no character
   useEffect(() => {
-    if (!character) {
-      router.replace('/create-character');
+    hydrate();
+  }, []);
+
+  useEffect(() => {
+    if (character === null) {
+      const timer = setTimeout(() => {
+        if (!usePlayerStore.getState().character) {
+          router.replace('/create-character');
+        }
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [character]);
 

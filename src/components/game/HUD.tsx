@@ -46,6 +46,14 @@ export default function HUD() {
   const focusQuest = QUESTS.find(q => character.questProgress[q.id] === 'active');
   const focusObj = focusQuest?.objectives.find(o => o.current < o.quantity);
 
+  // If no active quests, suggest the first available one
+  const suggestQuest = !focusQuest
+    ? QUESTS.find(q => {
+        if (q.hskRequired > character.hskLevel) return false;
+        return (character.questProgress[q.id] ?? 'not-started') === 'not-started';
+      })
+    : null;
+
   const togglePanel = (panel: ActivePanel) => {
     setActivePanel(activePanel === panel ? 'none' : panel);
   };
@@ -111,22 +119,36 @@ export default function HUD() {
         <div className="text-[10px] text-gray-500">{dayInfo.pinyin}</div>
       </div>
 
-      {/* Focus widget — next objective */}
-      {focusObj && (
+      {/* Focus widget — next objective or quest suggestion */}
+      {(focusObj || suggestQuest) && (
         <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 max-w-xs w-full px-3">
-          <div className="bg-gold-900/90 border border-gold-600/60 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
-            <div className="text-[10px] text-gold-400 font-bold uppercase tracking-wider mb-0.5">🎯 Próximo Passo</div>
-            <div className="text-xs text-parchment-200 truncate">{focusObj.description}</div>
-            {focusObj.quantity > 1 && (
-              <div className="mt-1.5">
-                <div className="h-1 bg-ink-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-1 bg-gold-400 rounded-full transition-all"
-                    style={{ width: `${Math.min(100, (focusObj.current / focusObj.quantity) * 100)}%` }}
-                  />
-                </div>
-                <div className="text-[10px] text-gold-400 mt-0.5">{focusObj.current}/{focusObj.quantity}</div>
-              </div>
+          <div className={`rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm border
+            ${focusObj
+              ? 'bg-gold-900/90 border-gold-600/60'
+              : 'bg-ink-900/90 border-jade-700/50'}`}
+          >
+            {focusObj ? (
+              <>
+                <div className="text-[10px] text-gold-400 font-bold uppercase tracking-wider mb-0.5">🎯 Próximo Passo</div>
+                <div className="text-xs text-parchment-200 truncate">{focusObj.description}</div>
+                {focusObj.quantity > 1 && (
+                  <div className="mt-1.5">
+                    <div className="h-1 bg-ink-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-1 bg-gold-400 rounded-full transition-all"
+                        style={{ width: `${Math.min(100, (focusObj.current / focusObj.quantity) * 100)}%` }}
+                      />
+                    </div>
+                    <div className="text-[10px] text-gold-400 mt-0.5">{focusObj.current}/{focusObj.quantity}</div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="text-[10px] text-jade-400 font-bold uppercase tracking-wider mb-0.5">💡 Sugestão</div>
+                <div className="text-xs text-parchment-200 truncate">{suggestQuest!.title.portuguese}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">📋 Abra Missões para começar</div>
+              </>
             )}
           </div>
         </div>

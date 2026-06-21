@@ -63,6 +63,17 @@ export default class WorldScene extends Phaser.Scene {
     if (data.region)       this.currentRegion = data.region;
     if (data.playerName)   this.playerName    = data.playerName;
     if (data.playerGender) this.playerGender  = data.playerGender as 'male' | 'female';
+    // Fall back to localStorage so the player's nickname shows in-world
+    if (this.playerName === 'Player' && typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('seplag_character');
+        if (saved) {
+          const char = JSON.parse(saved) as { nickname?: string; gender?: string };
+          if (char.nickname) this.playerName = char.nickname;
+          if (char.gender === 'female') this.playerGender = 'female';
+        }
+      } catch { /* ignore */ }
+    }
     // Apply constructor callbacks if not yet applied
     if (this.initCallbacks) {
       this.onNPCInteract  = this.initCallbacks.onNPCInteract;
