@@ -1,0 +1,15 @@
+import type { Achievement } from '@/types';
+
+export const ACHIEVEMENTS: Achievement[] = [
+  { id: 'first_steps',      hanzi: '第一步',     pinyin: 'dì yī bù',      title: 'Primeiros Passos',       description: 'Começou sua jornada no Mundo das Artes Marciais',              icon: '👣', condition: { type: 'level', value: 1 },         xpReward: 50,  rarity: 'bronze' },
+  { id: 'warrior_1',       hanzi: '初级武者',   pinyin: 'chūjí wǔzhě',   title: 'Guerreiro Iniciante',    description: 'Alcançou nível 5',                                              icon: '⚔️', condition: { type: 'level', value: 5 },         xpReward: 100, rarity: 'bronze' },
+  { id: 'warrior_10',      hanzi: '中级武者',   pinyin: 'zhōngjí wǔzhě', title: 'Guerreiro Intermediário',description: 'Alcançou nível 10',                                             icon: '🗡️', condition: { type: 'level', value: 10 },        xpReward: 200, rarity: 'silver' },
+  { id: 'warrior_20',      hanzi: '高级武者',   pinyin: 'gāojí wǔzhě',   title: 'Guerreiro Avançado',     description: 'Alcançou nível 20',                                             icon: '🌟', condition: { type: 'level', value: 20 },        xpReward: 500, rarity: 'gold'   },
+  { id: 'master',          hanzi: '大师',       pinyin: 'dàshī',          title: 'Grande Mestre',          description: 'Alcançou nível 50',                                             icon: '🏆', condition: { type: 'level', value: 50 },        xpReward: 2000, rarity: 'jade'  },
+  { id: 'wealthy',         hanzi: '富贾',       pinyin: 'fùgǔ',           title: 'Comerciante Rico',       description: 'Acumulou 1000 金',                                             icon: '💰', condition: { type: 'gold', value: 1000 },       xpReward: 150, rarity: 'silver' },
+  { id: 'devoted',         hanzi: '虔诚弟子',   pinyin: 'qiánchéng dìzǐ', title: 'Discípulo Devoto',       description: 'Fez login 7 dias seguidos',                                     icon: '🙏', condition: { type: 'login-streak', value: 7 },  xpReward: 200, rarity: 'silver' },
+  { id: 'persistent',     hanzi: '持之以恒',   pinyin: 'chí zhī yǐ héng', title: 'Perseverança',          description: 'Fez login 30 dias seguidos',                                    icon: '🔥', condition: { type: 'login-streak', value: 30 }, xpReward: 1000, rarity: 'gold'  },
+  { id: 'vocab_100',      hanzi: '百字通',     pinyin: 'bǎi zì tōng',    title: 'Domínio dos Cem Caracteres', description: 'Aprendeu 100 palavras em Mandarim',                      icon: '📖', condition: { type: 'vocab-learned', value: 100 }, xpReward: 300, rarity: 'silver' },
+  { id: 'vocab_500',      hanzi: '五百字通',   pinyin: 'wǔbǎi zì tōng',  title: 'Quinhentas Palavras',    description: 'Aprendeu 500 palavras em Mandarim',                             icon: '📚', condition: { type: 'vocab-learned', value: 500 }, xpReward: 1000, rarity: 'gold'  },
+  { id: 'hsk1_complete',  hanzi: 'HSK一级',    pinyin: 'HSK yī jí',       title: 'Mestre HSK 1',           description: 'Dominiu todo o vocabulário HSK1',                               icon: '🎓', condition: { type: 'hsk-mastered', value: 1 },  xpReward: 500, rarity: 'gold'   },
+];

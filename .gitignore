@@ -2,3 +2,13 @@ node_modules/
 dist/
 .claude/
 package-lock.json
+.next/
+out/
+.env
+.env.local
+.env.*.local
+*.pem
+.DS_Store
+npm-debug.log*
+*.tsbuildinfo
+next-env.d.ts

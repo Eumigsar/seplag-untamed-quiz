@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ──────────────────────────────────────────────
+   CSS Custom Properties
+────────────────────────────────────────────── */
+:root {
+  --color-ink-950: #0a0d12;
+  --color-ink-900: #0d1117;
+  --color-ink-800: #161b22;
+  --color-gold-300: #d4af37;
+  --color-gold-400: #c9a227;
+  --color-jade-300: #4ade80;
+  --scrollbar-bg: #0d1117;
+  --scrollbar-thumb: #2d4a3e;
+}
+
+/* ──────────────────────────────────────────────
+   Base Reset
+────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-ink-950);
+  color: #e8dcc8;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ──────────────────────────────────────────────
+   Scrollbar Styling
+────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3d6b52;
+}
+
+/* ──────────────────────────────────────────────
+   Chinese Font Class
+────────────────────────────────────────────── */
+.font-chinese {
+  font-family: 'Noto Serif SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', serif;
+}
+
+/* ──────────────────────────────────────────────
+   Game Canvas
+────────────────────────────────────────────── */
+#game-canvas canvas {
+  display: block;
+  outline: none;
+}
+
+/* ──────────────────────────────────────────────
+   Selection
+────────────────────────────────────────────── */
+::selection {
+  background: rgba(184, 134, 11, 0.4);
+  color: #fff;
+}
+
+/* ──────────────────────────────────────────────
+   Focus ring
+────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+/* ──────────────────────────────────────────────
+   Typography utilities
+────────────────────────────────────────────── */
+.text-shadow-gold {
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.text-shadow-jade {
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+}
+
+/* ──────────────────────────────────────────────
+   Accessibility — Dyslexia mode
+────────────────────────────────────────────── */
+body.dyslexia-mode {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+  line-height: 1.7;
+}
+
+body.large-font {
+  font-size: 18px;
+}
+
+body.high-contrast {
+  --color-ink-900: #000000;
+  --color-ink-800: #0a0a0a;
+  filter: contrast(1.2);
+}
+
+/* ──────────────────────────────────────────────
+   Pinyin tone marks helper classes
+────────────────────────────────────────────── */
+.tone-1 { color: #ef4444; }   /* — high flat */
+.tone-2 { color: #f59e0b; }   /* ´ rising    */
+.tone-3 { color: #10b981; }   /* ˇ dipping   */
+.tone-4 { color: #3b82f6; }   /* ` falling   */
+.tone-5 { color: #9ca3af; }   /* neutral      */
+
+/* ──────────────────────────────────────────────
+   Loading spinner
+────────────────────────────────────────────── */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* ──────────────────────────────────────────────
+   Dragon animation
+────────────────────────────────────────────── */
+@keyframes dragon-fly {
+  0%   { transform: translateX(-10px) rotate(-2deg); }
+  50%  { transform: translateX(10px) rotate(2deg); }
+  100% { transform: translateX(-10px) rotate(-2deg); }
+}
+.animate-dragon {
+  animation: dragon-fly 4s ease-in-out infinite;
+}
+
+/* ──────────────────────────────────────────────
+   Brush stroke decorative line
+────────────────────────────────────────────── */
+.brush-divider {
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    #b8860b 20%,
+    #d4af37 50%,
+    #b8860b 80%,
+    transparent
+  );
+  opacity: 0.6;
+}
+
+/* ──────────────────────────────────────────────
+   Glass card
+────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(13, 17, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+/* ──────────────────────────────────────────────
+   RPG notification pulse
+────────────────────────────────────────────── */
+@keyframes notification-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
+  50%       { box-shadow: 0 0 24px rgba(212, 175, 55, 0.7); }
+}
+.notification-glow {
+  animation: notification-glow 2s ease-in-out infinite;
+}
