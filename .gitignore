@@ -1,14 +1,6 @@
-node_modules/
-dist/
-.claude/
-package-lock.json
 .next/
-out/
+node_modules/
 .env
 .env.local
 .env.*.local
-*.pem
-.DS_Store
-npm-debug.log*
-*.tsbuildinfo
 next-env.d.ts

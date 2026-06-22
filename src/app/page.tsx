@@ -2,90 +2,71 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient';
-import { useAuthStore } from '@/store/useAuthStore';
-import { usePlayerStore } from '@/store/usePlayerStore';
+import { supabase, configured } from '@/lib/supabase';
+import { useAuth } from '@/store/auth';
+import { usePlayer } from '@/store/player';
 
-// Phaser + game UI must run client-side only (no SSR).
-const GameContainer = dynamic(() => import('@/components/GameContainer'), { ssr: false });
-const AuthScreen = dynamic(() => import('@/components/auth/AuthScreen'), { ssr: false });
+const AuthScreen        = dynamic(() => import('@/components/auth/AuthScreen'),        { ssr: false });
 const CharacterCreation = dynamic(() => import('@/components/game/CharacterCreation'), { ssr: false });
+const GameContainer     = dynamic(() => import('@/components/GameContainer'),           { ssr: false });
 
-export default function Home() {
-  const { session, setSession, initialized } = useAuthStore();
-  const { character, setCharacter } = usePlayerStore();
+export default function Page() {
+  const { session, setSession, ready } = useAuth();
+  const { character, setCharacter } = usePlayer();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
+    if (!configured) { setLoading(false); return; }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) fetchCharacter(session.user.id);
+      if (session) loadChar(session.user.id).then(() => setLoading(false));
       else setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) fetchCharacter(session.user.id);
-      else {
-        setCharacter(null);
-        setLoading(false);
-      }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_ev, s) => {
+      setSession(s);
+      if (s) loadChar(s.user.id);
+      else { setCharacter(null); }
     });
 
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function fetchCharacter(userId: string) {
-    const { data } = await supabase
-      .from('characters')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (data) setCharacter(data);
-    setLoading(false);
+  async function loadChar(uid: string) {
+    const { data } = await supabase.from('characters').select('*').eq('user_id', uid).single();
+    setCharacter(data);
   }
 
-  if (!isSupabaseConfigured) return <ConfigNotice />;
-
-  if (!initialized || loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-ink text-jade">
-        Carregando...
-      </div>
-    );
-  }
-
-  if (!session) return <AuthScreen />;
-  if (!character) return <CharacterCreation />;
-  return <GameContainer />;
-}
-
-function ConfigNotice() {
-  return (
+  if (!configured) return (
     <div className="flex min-h-screen items-center justify-center bg-ink p-6">
-      <div className="max-w-md w-full p-8 bg-black/70 border-2 border-jade/50 rounded-lg text-center">
-        <h1 className="text-2xl font-bold text-jade mb-2">Mandarin Legends</h1>
-        <p className="text-paper/70 mb-4 italic">Academia dos Mil Hanzi</p>
-        <div className="text-left text-sm text-paper/80 space-y-2">
-          <p>⚠ Supabase ainda não está configurado.</p>
-          <p>Defina as variáveis de ambiente e refaça o deploy:</p>
-          <pre className="bg-ink/80 border border-jade/20 rounded p-3 text-xs overflow-x-auto">
+      <div className="max-w-md w-full card p-8 text-center">
+        <span className="text-5xl font-chinese text-gold animate-float inline-block mb-4">學</span>
+        <h1 className="text-2xl font-bold text-gold mb-2">Mandarin Academy</h1>
+        <p className="text-paper/50 text-sm mb-6 italic">Academia dos Mil Hanzi</p>
+        <div className="text-left text-sm text-paper/60 space-y-3">
+          <p className="text-paper/40">⚙ Configure as variáveis de ambiente no Vercel:</p>
+          <pre className="bg-ink border border-gold/15 rounded-lg p-4 text-xs text-gold/70 overflow-x-auto">
 {`NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...`}
           </pre>
-          <p className="text-paper/50">
-            Na Vercel: Project → Settings → Environment Variables. Rode também a
-            migration em <code className="text-jade">supabase/migrations</code>.
-          </p>
+          <p className="text-paper/30 text-xs">Project → Settings → Environment Variables → Redeploy</p>
         </div>
       </div>
     </div>
   );
+
+  if (!ready || loading) return (
+    <div className="flex min-h-screen items-center justify-center bg-ink">
+      <div className="text-center">
+        <span className="text-6xl font-chinese text-gold animate-float inline-block">學</span>
+        <p className="text-paper/40 text-sm mt-4 animate-pulse">Carregando Academia...</p>
+      </div>
+    </div>
+  );
+
+  if (!session)   return <AuthScreen />;
+  if (!character) return <CharacterCreation />;
+  return <GameContainer />;
 }

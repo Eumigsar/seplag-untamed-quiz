@@ -1,29 +1,21 @@
 'use client';
 
-import { useRef } from 'react';
-import { PhaserGame, IRefPhaser } from '@/game/PhaserGame';
+import dynamic from 'next/dynamic';
 import HUD from '@/components/game/HUD';
-import DialogBox from '@/components/game/DialogBox';
-import MobileJoystick from '@/components/game/MobileJoystick';
-import GameManager from '@/components/game/GameManager';
+import Dialog from '@/components/game/Dialog';
+import Joystick from '@/components/game/Joystick';
+import GameSync from '@/components/game/GameSync';
+
+const PhaserGame = dynamic(() => import('@/game/PhaserGame').then(m => m.PhaserGame), { ssr: false });
 
 export default function GameContainer() {
-  const phaserRef = useRef<IRefPhaser>(null);
-
   return (
     <div className="relative w-full h-screen overflow-hidden bg-ink">
-      {/* Background sync logic */}
-      <GameManager />
-
-      {/* Engine canvas */}
-      <PhaserGame ref={phaserRef} />
-
-      {/* Interactive UI layer */}
-      <div className="absolute inset-0 pointer-events-none">
-        <HUD />
-        <DialogBox />
-        <MobileJoystick />
-      </div>
+      <GameSync />
+      <PhaserGame />
+      <HUD />
+      <Dialog />
+      <Joystick />
     </div>
   );
 }

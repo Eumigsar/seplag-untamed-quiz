@@ -2,31 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 245, 245, 220;
-  --background-start-rgb: 26, 26, 26;
-  --background-end-rgb: 26, 26, 26;
-}
+:root { color-scheme: dark; }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
   margin: 0;
   padding: 0;
+  background: #0A0F1E;
+  color: #F0E6C8;
   overflow: hidden;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-canvas {
-  display: block;
-}
+canvas { display: block; }
 
 @layer components {
-  .btn-primary {
-    @apply bg-imperial hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors disabled:opacity-50;
+  .btn-gold {
+    @apply bg-gradient-to-b from-gold to-yellow-700 text-ink font-bold py-3 px-6 rounded-lg
+           transition-all duration-200 hover:brightness-110 active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_12px_#D4AF3780];
   }
-  .input-field {
-    @apply bg-ink border border-jade/30 text-paper p-2 rounded focus:outline-none focus:border-jade w-full;
+  .btn-ghost {
+    @apply border border-gold/40 text-gold/80 font-medium py-2 px-4 rounded-lg
+           transition-all duration-200 hover:border-gold hover:text-gold hover:bg-gold/10;
+  }
+  .input {
+    @apply w-full bg-ink/80 border border-gold/25 text-paper placeholder-paper/30
+           px-4 py-3 rounded-lg focus:outline-none focus:border-gold/70 focus:bg-ink
+           transition-colors duration-200;
+  }
+  .card {
+    @apply bg-stone/60 border border-gold/20 rounded-xl backdrop-blur-sm;
+  }
+  .hanzi-btn {
+    @apply flex flex-col items-center justify-center gap-1 p-3 rounded-xl
+           bg-ink/60 border border-jade/20 hover:border-jade hover:bg-jade/10
+           transition-all duration-150 active:scale-95 cursor-pointer;
   }
 }

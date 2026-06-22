@@ -1,61 +1,53 @@
 'use client';
 
-import { usePlayerStore } from '@/store/usePlayerStore';
-import { useAuthStore } from '@/store/useAuthStore';
-import { LogOut, Book, User, Settings } from 'lucide-react';
+import { usePlayer } from '@/store/player';
+import { useAuth } from '@/store/auth';
+import { LogOut, BookOpen, Sparkles } from 'lucide-react';
 
 export default function HUD() {
-  const { character } = usePlayerStore();
-  const { signOut } = useAuthStore();
-
+  const { character, learned } = usePlayer();
+  const { signOut } = useAuth();
   if (!character) return null;
 
+  const xpPct = character.xp % 100;
+  const nextLevel = character.level * 100;
+
   return (
-    <div className="w-full h-full p-4 flex flex-col justify-between">
-      {/* Top Bar */}
-      <div className="flex justify-between items-start">
-        <div className="flex gap-4 pointer-events-auto">
-          <div className="bg-black/70 border border-jade/50 p-2 rounded flex items-center gap-3">
-            <div className="w-12 h-12 bg-jade/20 rounded-full border border-jade flex items-center justify-center font-bold text-xl text-jade">
+    <div className="absolute inset-0 pointer-events-none p-3 flex flex-col justify-between">
+      <div className="flex items-start gap-3 pointer-events-auto">
+        <div className="card px-4 py-3 flex items-center gap-3 shadow-[0_0_20px_#D4AF3720]">
+          <div className="relative">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gold/30 to-gold/10 border border-gold/50 flex items-center justify-center text-gold font-bold text-lg">
               {character.level}
             </div>
-            <div>
-              <p className="font-bold text-jade leading-none mb-1">{character.name}</p>
-              <div className="w-32 h-2 bg-gray-800 rounded-full overflow-hidden">
-                <div className="h-full bg-jade transition-all" style={{ width: `${character.xp % 100}%` }} />
-              </div>
-              <p className="text-[10px] uppercase text-paper/50 mt-1">Qi: {character.qi}/100</p>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-jade rounded-full border border-ink flex items-center justify-center">
+              <Sparkles size={9} className="text-ink" />
             </div>
           </div>
-        </div>
-
-        <div className="flex gap-2 pointer-events-auto">
-          <button className="p-2 bg-black/70 border border-jade/50 rounded hover:bg-jade/20 transition-colors text-jade">
-            <Book size={20} />
-          </button>
-          <button className="p-2 bg-black/70 border border-jade/50 rounded hover:bg-jade/20 transition-colors text-jade">
-            <Settings size={20} />
-          </button>
-          <button
-            onClick={() => signOut()}
-            className="p-2 bg-black/70 border border-imperial/50 rounded hover:bg-imperial/20 transition-colors text-imperial"
-          >
-            <LogOut size={20} />
-          </button>
+          <div>
+            <p className="font-semibold text-gold text-sm leading-none">{character.name}</p>
+            <div className="w-28 h-1.5 bg-ink rounded-full mt-1.5 overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-jade to-gold rounded-full transition-all duration-500"
+                style={{ width: `${xpPct}%` }} />
+            </div>
+            <p className="text-paper/40 text-[10px] mt-0.5">{character.xp} / {nextLevel} XP</p>
+          </div>
         </div>
       </div>
-
-      {/* Bottom Bar / Quick Actions */}
+      <div className="absolute top-3 right-3 flex gap-2 pointer-events-auto">
+        <div className="card px-3 py-2 flex items-center gap-1.5 text-gold/70 text-xs">
+          <BookOpen size={14} />
+          <span>{learned.length} Hanzi</span>
+        </div>
+        <button onClick={signOut} className="card p-2.5 text-paper/40 hover:text-crimson hover:border-crimson/40 transition-colors">
+          <LogOut size={16} />
+        </button>
+      </div>
       <div className="flex justify-center">
-        <div className="bg-black/70 border-t border-x border-jade/50 px-6 py-2 rounded-t-xl flex gap-8 pointer-events-auto">
-          <button className="flex flex-col items-center text-jade/70 hover:text-jade">
-            <User size={24} />
-            <span className="text-[10px] uppercase font-bold">Perfil</span>
-          </button>
-          <button className="flex flex-col items-center text-jade/70 hover:text-jade">
-            <Book size={24} />
-            <span className="text-[10px] uppercase font-bold">Hanzi</span>
-          </button>
+        <div className="card px-4 py-2 text-paper/25 text-xs flex gap-3 pointer-events-none">
+          <span>WASD ou ← → ↑ ↓ para mover</span>
+          <span className="text-paper/15">•</span>
+          <span>Encontre o Sifu Li para aprender</span>
         </div>
       </div>
     </div>

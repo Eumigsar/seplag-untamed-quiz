@@ -1,35 +1,19 @@
 'use client';
 
 import { forwardRef, useLayoutEffect, useRef } from 'react';
-import type Phaser from 'phaser';
-import { StartGame } from './main';
+import { startGame } from './main';
 
-export interface IRefPhaser {
-  game: Phaser.Game | null;
-  scene: Phaser.Scene | null;
-}
+export interface GameRef { game: Phaser.Game | null }
 
-export const PhaserGame = forwardRef<IRefPhaser>(function PhaserGame(_, ref) {
+export const PhaserGame = forwardRef<GameRef>(function PhaserGame(_, ref) {
   const gameRef = useRef<Phaser.Game | null>(null);
 
   useLayoutEffect(() => {
-    if (gameRef.current === null) {
-      gameRef.current = StartGame('game-container');
-
-      if (typeof ref === 'function') {
-        ref({ game: gameRef.current, scene: null });
-      } else if (ref) {
-        ref.current = { game: gameRef.current, scene: null };
-      }
-    }
-
-    return () => {
-      if (gameRef.current) {
-        gameRef.current.destroy(true);
-        gameRef.current = null;
-      }
-    };
+    if (gameRef.current) return;
+    gameRef.current = startGame('game-root');
+    if (ref && typeof ref !== 'function') ref.current = { game: gameRef.current };
+    return () => { gameRef.current?.destroy(true); gameRef.current = null; };
   }, [ref]);
 
-  return <div id="game-container" className="w-full h-full" />;
+  return <div id="game-root" className="w-full h-full" />;
 });
