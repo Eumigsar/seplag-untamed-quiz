@@ -6,6 +6,9 @@ import HUD from '@/components/game/HUD';
 import Dialog from '@/components/game/Dialog';
 import Joystick from '@/components/game/Joystick';
 import GameSync from '@/components/game/GameSync';
+import QuestLog from '@/components/game/QuestLog';
+import VocabularyPanel from '@/components/game/VocabularyPanel';
+import AchievementsPanel from '@/components/game/AchievementsPanel';
 
 export default function GameContainer() {
   const phaserRef = useRef<IRefPhaser>(null);
@@ -17,6 +20,9 @@ export default function GameContainer() {
         <HUD />
         <Dialog />
         <Joystick />
+        <QuestLog />
+        <VocabularyPanel />
+        <AchievementsPanel />
       </div>
     </div>
   );
