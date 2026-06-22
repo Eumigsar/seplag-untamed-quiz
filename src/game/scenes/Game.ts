@@ -8,7 +8,7 @@ const ROWS = Math.ceil(H / TILE) + 2;
 const SPEED = 180;
 
 function buildFloor(scene: Scene) {
-  const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const dark = (r + c) % 2 === 0;
@@ -23,7 +23,7 @@ function buildFloor(scene: Scene) {
 }
 
 function buildWall(scene: Scene) {
-  const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0x1a0a00, 1);
   g.fillRect(0, 0, TILE, TILE);
   g.fillStyle(0x2d1200, 1);
@@ -37,7 +37,7 @@ function buildWall(scene: Scene) {
 }
 
 function buildPlayer(scene: Scene) {
-  const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0x000000, 0.25);
   g.fillEllipse(24, 58, 36, 10);
   g.fillStyle(0x2a5caa, 1);
@@ -69,7 +69,7 @@ function buildPlayer(scene: Scene) {
 }
 
 function buildSifu(scene: Scene) {
-  const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0x000000, 0.3);
   g.fillEllipse(32, 74, 44, 12);
   g.fillStyle(0x8b6914, 1);
@@ -108,7 +108,7 @@ function buildSifu(scene: Scene) {
 }
 
 function buildLantern(scene: Scene) {
-  const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0xffaa00, 0.15);
   g.fillCircle(16, 20, 24);
   g.fillStyle(0xcc2200, 1);
@@ -128,7 +128,7 @@ function buildLantern(scene: Scene) {
 }
 
 function buildParticle(scene: Scene) {
-  const g = scene.make.graphics({ x: 0, y: 0, add: false });
+  const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0xd4af37, 1);
   g.fillCircle(4, 4, 4);
   g.generateTexture('particle', 8, 8);
