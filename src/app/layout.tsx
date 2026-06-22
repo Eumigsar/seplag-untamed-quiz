@@ -1,5 +1,22 @@
 import type { Metadata, Viewport } from 'next';
+import { Noto_Sans_SC, Noto_Serif_SC } from 'next/font/google';
 import './globals.css';
+
+const notoSans = Noto_Sans_SC({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-noto-sans',
+  display: 'swap',
+  preload: false,
+});
+
+const notoSerif = Noto_Serif_SC({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-noto-serif',
+  display: 'swap',
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: '武侠学堂 · Wǔxiá Xuétáng — Aprenda Mandarim',
@@ -25,10 +42,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="pt-BR" suppressHydrationWarning className={`${notoSans.variable} ${notoSerif.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <meta name="color-scheme" content="dark" />
       </head>
       <body className="bg-ink-950 text-parchment-100 antialiased">

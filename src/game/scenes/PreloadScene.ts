@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { COLORS, TILE_SIZE } from '../config';
 
 export default class PreloadScene extends Phaser.Scene {
@@ -80,6 +80,30 @@ export default class PreloadScene extends Phaser.Scene {
     this.createEnemySprite('enemy-dummy',         0x8B4513);
 
     this.createHPBarTextures();
+
+    // Grim Soul atmosphere assets
+    this.createShadowTexture();
+    this.createDecorTextures();
+    this.createVisionTexture();
+    this.createEmberTexture();
+  }
+
+  // ─── Color helpers ───────────────────────────────────────────────────────────
+
+  private darkenC(color: number, f: number): number {
+    const r = Math.max(0, Math.floor(((color >> 16) & 0xff) * (1 - f)));
+    const g = Math.max(0, Math.floor(((color >> 8)  & 0xff) * (1 - f)));
+    const b = Math.max(0, Math.floor((color & 0xff) * (1 - f)));
+    return (r << 16) | (g << 8) | b;
+  }
+
+  // Mix toward a slate-blue to desaturate for the Grim Soul mood
+  private moody(color: number, amount: number): number {
+    const tr = 0x1c, tg = 0x24, tb = 0x34;
+    const r = Math.floor(((color >> 16) & 0xff) * (1 - amount) + tr * amount);
+    const g = Math.floor(((color >> 8)  & 0xff) * (1 - amount) + tg * amount);
+    const b = Math.floor((color & 0xff) * (1 - amount) + tb * amount);
+    return (r << 16) | (g << 8) | b;
   }
 
   // ─── Player sprites (SVG) ───────────────────────────────────────────────────
@@ -125,16 +149,156 @@ export default class PreloadScene extends Phaser.Scene {
 
   // ─── Tiles ──────────────────────────────────────────────────────────────────
 
-  private createTile(key: string, base: number, shadow: number) {
+  private createTile(key: string, baseRaw: number, shadowRaw: number) {
     const gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
     const s = TILE_SIZE;
+
+    // Desaturate + darken toward slate for the Grim Soul mood
+    const base   = this.darkenC(this.moody(baseRaw, 0.42), 0.30);
+    const shadow = this.darkenC(this.moody(shadowRaw, 0.42), 0.38);
+    const hi     = this.moody(baseRaw, 0.25);
+
     gfx.fillStyle(base);
     gfx.fillRect(0, 0, s, s);
-    gfx.fillStyle(shadow, 0.3);
+
+    // Deterministic per-tile noise so adjacent tiles differ subtly
+    let seed = 0;
+    for (let i = 0; i < key.length; i++) seed = (seed * 31 + key.charCodeAt(i)) & 0xffff;
+    const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+
+    // Scattered texture flecks (darker + lighter)
+    for (let i = 0; i < 14; i++) {
+      const x = Math.floor(rand() * s);
+      const y = Math.floor(rand() * s);
+      const sz = 1 + Math.floor(rand() * 2);
+      gfx.fillStyle(rand() > 0.5 ? shadow : hi, 0.22 + rand() * 0.18);
+      gfx.fillRect(x, y, sz, sz);
+    }
+
+    // Per-type accents
+    if (key === 'tile-grass' || key === 'tile-bamboo') {
+      // grass blades
+      gfx.fillStyle(hi, 0.5);
+      for (let i = 0; i < 5; i++) {
+        const x = 3 + Math.floor(rand() * (s - 6));
+        const y = 4 + Math.floor(rand() * (s - 8));
+        gfx.fillRect(x, y, 1, 2 + Math.floor(rand() * 2));
+      }
+    } else if (key === 'tile-water') {
+      // ripples
+      gfx.fillStyle(hi, 0.35);
+      for (let i = 0; i < 3; i++) {
+        const y = 4 + Math.floor(rand() * (s - 8));
+        gfx.fillRect(4, y, s - 8, 1);
+      }
+    } else if (key === 'tile-stone' || key === 'tile-mountain' || key === 'tile-path') {
+      // cracks
+      gfx.fillStyle(shadow, 0.5);
+      gfx.fillRect(Math.floor(rand() * s), 0, 1, s);
+      gfx.fillRect(0, Math.floor(rand() * s), s, 1);
+    }
+
+    // Inset edge shadow (depth between tiles)
+    gfx.fillStyle(0x05070e, 0.32);
     gfx.fillRect(0, s - 2, s, 2);
     gfx.fillRect(s - 2, 0, 2, s);
+    gfx.fillStyle(hi, 0.10);
+    gfx.fillRect(0, 0, s, 1);
+    gfx.fillRect(0, 0, 1, s);
+
     gfx.generateTexture(key, s, s);
     gfx.destroy();
+  }
+
+  // ─── Grim Soul atmosphere textures ────────────────────────────────────────────
+
+  // Soft round drop-shadow for entities
+  private createShadowTexture() {
+    const size = 64;
+    const tex = this.textures.createCanvas('soft-shadow', size, size);
+    if (!tex) return;
+    const ctx = tex.getContext();
+    const g = ctx.createRadialGradient(size / 2, size / 2, 2, size / 2, size / 2, size / 2);
+    g.addColorStop(0, 'rgba(0,0,0,0.55)');
+    g.addColorStop(0.6, 'rgba(0,0,0,0.30)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, size, size);
+    tex.refresh();
+  }
+
+  // Decorations scattered through the world: rock, grass tuft, dead tree
+  private createDecorTextures() {
+    // Rock
+    let gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
+    gfx.fillStyle(0x3a4150);
+    gfx.fillEllipse(12, 16, 22, 14);
+    gfx.fillStyle(0x4a5260);
+    gfx.fillEllipse(10, 13, 16, 9);
+    gfx.fillStyle(0x2a313e);
+    gfx.fillEllipse(15, 18, 10, 6);
+    gfx.generateTexture('decor-rock', 24, 24);
+    gfx.destroy();
+
+    // Grass tuft
+    gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
+    const blade = 0x3a5a3e;
+    gfx.fillStyle(blade);
+    [[4,16,2,8],[8,14,2,10],[12,15,2,9],[16,16,2,8],[6,17,2,6],[14,17,2,6]].forEach(([x,y,w,h]) =>
+      gfx.fillRect(x, y, w, h));
+    gfx.fillStyle(0x4c7050, 0.7);
+    [[8,12,2,6],[12,13,2,6]].forEach(([x,y,w,h]) => gfx.fillRect(x, y, w, h));
+    gfx.generateTexture('decor-grass', 24, 24);
+    gfx.destroy();
+
+    // Dead / atmospheric tree
+    gfx = this.make.graphics({ x: 0, y: 0, add: false } as any);
+    gfx.fillStyle(0x2a2018);
+    gfx.fillRect(13, 24, 6, 20);
+    gfx.fillStyle(0x352a1f);
+    gfx.fillRect(13, 24, 2, 20);
+    // bare branches
+    gfx.lineStyle(2, 0x2a2018, 1);
+    gfx.beginPath();
+    gfx.moveTo(16, 26); gfx.lineTo(6, 14);
+    gfx.moveTo(16, 30); gfx.lineTo(26, 18);
+    gfx.moveTo(16, 22); gfx.lineTo(16, 6);
+    gfx.moveTo(16, 18); gfx.lineTo(8, 8);
+    gfx.moveTo(16, 18); gfx.lineTo(24, 8);
+    gfx.strokePath();
+    gfx.generateTexture('decor-deadtree', 32, 44);
+    gfx.destroy();
+  }
+
+  // Radial vision/vignette — transparent center, dark edges (torch radius)
+  private createVisionTexture() {
+    const size = 1024;
+    const tex = this.textures.createCanvas('vision', size, size);
+    if (!tex) return;
+    const ctx = tex.getContext();
+    const g = ctx.createRadialGradient(size / 2, size / 2, size * 0.10, size / 2, size / 2, size * 0.52);
+    g.addColorStop(0,    'rgba(6,9,18,0)');
+    g.addColorStop(0.50, 'rgba(6,9,18,0.10)');
+    g.addColorStop(0.74, 'rgba(5,8,15,0.48)');
+    g.addColorStop(1,    'rgba(3,5,10,0.93)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, size, size);
+    tex.refresh();
+  }
+
+  // Small soft glowing ember/dust mote
+  private createEmberTexture() {
+    const size = 16;
+    const tex = this.textures.createCanvas('ember', size, size);
+    if (!tex) return;
+    const ctx = tex.getContext();
+    const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    g.addColorStop(0,   'rgba(255,210,140,0.95)');
+    g.addColorStop(0.5, 'rgba(220,160,80,0.45)');
+    g.addColorStop(1,   'rgba(220,160,80,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, size, size);
+    tex.refresh();
   }
 
   // ─── Objects ────────────────────────────────────────────────────────────────

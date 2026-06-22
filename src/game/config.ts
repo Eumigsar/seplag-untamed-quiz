@@ -1,4 +1,4 @@
-import type { Types } from 'phaser';
+import * as Phaser from 'phaser';
 
 export const TILE_SIZE    = 32;
 export const MAP_WIDTH    = 80;
@@ -43,7 +43,7 @@ export const DEPTHS = {
   ui:        100,
 };
 
-export const getPhaserConfig = (parent: string): Types.Core.GameConfig => {
+export const getPhaserConfig = (parent: string): Phaser.Types.Core.GameConfig => {
   const w = typeof window !== 'undefined' ? window.innerWidth : GAME_WIDTH;
   const h = typeof window !== 'undefined' ? window.innerHeight : GAME_HEIGHT;
   return {

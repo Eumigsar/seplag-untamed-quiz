@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import {
   TILE_SIZE, GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED,
   COLORS, DEPTHS, WORLD_WIDTH, WORLD_HEIGHT
@@ -41,6 +41,12 @@ export default class WorldScene extends Phaser.Scene {
   private weatherOverlay?: Phaser.GameObjects.Rectangle;
   private weatherParticles: Phaser.GameObjects.Text[] = [];
   private playerLabel?: Phaser.GameObjects.Text;
+
+  // Grim Soul atmosphere
+  private visionOverlay?: Phaser.GameObjects.Image;
+  private moodTint?:      Phaser.GameObjects.Rectangle;
+  private playerShadow?:  Phaser.GameObjects.Image;
+  private embers:         Phaser.GameObjects.Image[] = [];
   private tileMap?: TileMap;
   private playerName = 'Player';
   private playerGender: 'male' | 'female' = 'male';
@@ -101,6 +107,11 @@ export default class WorldScene extends Phaser.Scene {
     this.setupInput();
     this.createWeatherOverlay();
     this.addRegionLabel();
+    this.createMoodTint();
+    this.createPlayerShadow();
+    this.createVisionOverlay();
+    this.spawnEmbers();
+    this.scatterDecor();
     this.events.on('shutdown', this.cleanup, this);
   }
 
@@ -466,6 +477,91 @@ export default class WorldScene extends Phaser.Scene {
     this.joyGraphics.strokeCircle(nx, ny, this.NUB_R);
   }
 
+  // ─── Grim Soul Atmosphere ──────────────────────────────────────────────────
+
+  private createMoodTint() {
+    const w = this.scale.width;
+    const h = this.scale.height;
+    this.moodTint = this.add.rectangle(w / 2, h / 2, w, h, 0x05070e, 0.18)
+      .setDepth(DEPTHS.particles - 5)
+      .setScrollFactor(0);
+  }
+
+  private createVisionOverlay() {
+    if (!this.textures.exists('vision')) return;
+    const w = this.scale.width;
+    const h = this.scale.height;
+    const scale = Math.max(w, h) / 512; // vision texture is 1024 but center matters
+    this.visionOverlay = this.add.image(w / 2, h / 2, 'vision')
+      .setDepth(DEPTHS.ui - 5)
+      .setScrollFactor(0)
+      .setScale(scale * 1.2)
+      .setAlpha(0.85);
+  }
+
+  private createPlayerShadow() {
+    if (!this.textures.exists('soft-shadow')) return;
+    this.playerShadow = this.add.image(this.player.x, this.player.y + 14, 'soft-shadow')
+      .setDepth(DEPTHS.player - 1)
+      .setScale(0.9)
+      .setAlpha(0.5);
+  }
+
+  private spawnEmbers() {
+    if (!this.textures.exists('ember')) return;
+    const w = this.scale.width;
+    const h = this.scale.height;
+    for (let i = 0; i < 18; i++) {
+      const x = Math.random() * w;
+      const y = Math.random() * h;
+      const ember = this.add.image(x, y, 'ember')
+        .setDepth(DEPTHS.particles + 1)
+        .setScrollFactor(0)
+        .setScale(0.4 + Math.random() * 0.5)
+        .setAlpha(0);
+      this.embers.push(ember);
+      this.tweens.add({
+        targets: ember,
+        y: y - 40 - Math.random() * 60,
+        alpha: { from: 0, to: 0.55 + Math.random() * 0.3 },
+        yoyo: true,
+        duration: 2000 + Math.random() * 2500,
+        delay: Math.random() * 3000,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+        onRepeat: () => {
+          ember.x = Math.random() * w;
+          ember.y = 20 + Math.random() * h;
+        },
+      });
+    }
+  }
+
+  private scatterDecor() {
+    if (!this.tileMap) return;
+    const tiles = this.tileMap.tiles;
+    const rows = tiles.length;
+    const cols = tiles[0]?.length ?? 0;
+    const decorTypes = ['decor-rock', 'decor-grass', 'decor-deadtree'];
+
+    for (let r = 2; r < rows - 2; r++) {
+      for (let c = 2; c < cols - 2; c++) {
+        const t = tiles[r][c];
+        if (t !== TILE.GRASS && t !== TILE.BAMBOO) continue;
+        // ~5% chance per grass tile
+        if (Math.random() > 0.05) continue;
+        const key = decorTypes[Math.floor(Math.random() * decorTypes.length)];
+        if (!this.textures.exists(key)) continue;
+        const px = c * TILE_SIZE + TILE_SIZE / 2 + (Math.random() * 16 - 8);
+        const py = r * TILE_SIZE + TILE_SIZE - 4;
+        this.add.image(px, py, key)
+          .setDepth(DEPTHS.objects - 1)
+          .setOrigin(0.5, 1)
+          .setAlpha(0.7 + Math.random() * 0.25);
+      }
+    }
+  }
+
   // ─── Weather ───────────────────────────────────────────────────────────────
 
   private createWeatherOverlay() {
@@ -612,6 +708,7 @@ export default class WorldScene extends Phaser.Scene {
     this.handleMovement();
     this.checkNPCProximity();
     this.updatePlayerLabel();
+    this.updateAtmosphere();
   }
 
   private handleMovement() {
@@ -674,8 +771,16 @@ export default class WorldScene extends Phaser.Scene {
     }
   }
 
+  private updateAtmosphere() {
+    if (this.playerShadow) {
+      this.playerShadow.setPosition(this.player.x, this.player.y + 14);
+    }
+  }
+
   private cleanup() {
     this.weatherParticles.forEach(p => p.destroy());
+    this.embers.forEach(e => e.destroy());
+    this.embers = [];
     this.joyGraphics?.destroy();
   }
 }
