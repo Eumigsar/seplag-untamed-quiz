@@ -1,136 +1,114 @@
-# 修道 · Simulado SEPLAG-RJ · 陈情令
+# Mandarin Legends: Academia dos Mil Hanzi
 
-> Simulador de questões com IA para o concurso **SEPLAG-RJ FGV 2026** (cargos EPPGG e APO), com tema visual de **The Untamed / 陈情令**.
+> RPG de sobrevivência e crafting no navegador para aprender **Mandarim (HSK 1–4)**. O jogador é um "Escriba do Destino" que reconstrói a Academia dos Mil Hanzi, aprendendo caracteres para progredir.
 
----
+Stack: **Next.js 14** + **Phaser 3** + **Supabase** + **Zustand** + **Tailwind CSS**, deploy na **Vercel**.
 
-## ✨ Funcionalidades
-
-| Feature | Descrição |
-|---|---|
-| 🤖 **IA Claude Sonnet 4.6** | Gera questões inéditas com gabarito e comentário FGV-contextualizado |
-| 👤 **Perfil de cultivador** | Nome salvo, progresso por usuário no localStorage |
-| ⏱ **Cronômetro** | Tempo de sessão + tempo acumulado por matéria |
-| 📊 **Desempenho** | Aproveitamento, questões feitas e horas de estudo por matéria |
-| ☯ **Revisão de erros** | Questões erradas ficam salvas para revisão posterior |
-| 🎵 **Áudio** | Som de guqin no acerto, tom grave no erro, música pentatônica ambiente |
-| 🌸 **Visual** | Pétalas caindo, 3 fundos temáticos (Lotus Pier · Cloud Recesses · Burial Mounds) |
-| 🗣 **Personagens** | Wei Wuxian e Lan Zhan aparecem com falas de incentivo/consolo |
+> ⚠ **Estado atual: scaffold MVP.** A base (auth, criação de personagem, mundo navegável, diálogo com o Sifu e aprendizado de Hanzi) está montada. Os assets de arte (spritesheets `player.png`/`sifu.png` e o tileset `academy_tileset.png`) ainda **não existem no repositório** — enquanto não forem adicionados em `public/assets/`, o jogo usa **placeholders verdes** gerados automaticamente. O mapa (chão + paredes) já renderiza via tilemap.
 
 ---
 
-## 🖼 Cenários temáticos
+## 🚀 Deploy na Vercel
 
-| Aba | Local | Atmosfera |
-|---|---|---|
-| ⚔ Simulado | **Lotus Pier 莲花坞** | Céu noturno roxo-azul, lótus dourados, lanternas vermelhas, pavilhão sobre o lago |
-| ☯ Revisão | **Cloud Recesses 雲深不知處** | Montanhas nevadas com névoa, portão com caligrafia, wistéria roxa |
-| 卷 Desempenho | **Burial Mounds 乱葬岗** | Céu escarlate-negro, árvores retorcidas, talismãs flutuantes (符咒魂止煞) |
+1. Acesse [vercel.com/new](https://vercel.com/new) e importe **`Eumigsar/seplag-untamed-quiz`**
+2. Selecione a branch (ex.: `claude/mandarim-rpg-game-iwwsk5`)
+3. Em **Environment Variables**, adicione (**obrigatório** — sem isso o jogo mostra um aviso de configuração):
+   | Nome | Valor |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave `anon public` do Supabase |
+4. Clique **Deploy** → você recebe `https://<seu-projeto>.vercel.app`
 
----
+A configuração de build está em [`vercel.json`](./vercel.json).
 
-## 📚 Matérias disponíveis
+> Sem as variáveis do Supabase, o app **não dá tela branca** — ele mostra uma tela explicando que falta configurar (a autenticação é obrigatória nesta arquitetura).
 
-- Língua Portuguesa
-- Raciocínio Lógico
-- Direito Administrativo
-- Direito Constitucional
-- Administração e Governança Pública
-- Políticas Públicas
-- Administração Financeira e Orçamentária
-- Finanças Públicas
-- Estatuto dos Servidores RJ
-- Reforma Administrativa
-- Tecnologia da Informação
-- Ética no Serviço Público
+### Configurar o Supabase
+
+1. Crie um projeto em [supabase.com](https://supabase.com)
+2. **Project Settings → API**: copie `URL` e a chave `anon public`
+3. **SQL Editor**: rode o script [`supabase/migrations/20231027_initial_schema.sql`](./supabase/migrations/20231027_initial_schema.sql) (cria tabelas + RLS)
+4. Defina as variáveis (local em `.env.local` ou no painel da Vercel)
 
 ---
 
-## 🚀 Como usar
+## 💻 Rodar localmente
 
-### Opção 1 — Instalar o .exe (Windows)
-
-1. Baixe o instalador na seção [Releases](../../releases)
-2. Execute e instale normalmente
-3. Abra o app e insira sua **chave API Anthropic** no campo no topo (obtenha em [console.anthropic.com](https://console.anthropic.com))
-4. Clique **✦ salvar** — a chave fica armazenada localmente
-5. Crie seu perfil de cultivador e comece!
-
-### Opção 2 — Rodar em modo desenvolvimento
+> **Requisito:** Node.js 18.18+ (recomendado 20 — veja `.nvmrc`).
 
 ```bash
 git clone https://github.com/Eumigsar/seplag-untamed-quiz.git
 cd seplag-untamed-quiz
 npm install
-npm start
+
+cp .env.example .env.local   # edite com suas chaves do Supabase
+
+npm run dev                  # http://localhost:3000
 ```
 
-> **Requisito:** Node.js 18+ e uma chave API Anthropic válida.
-
-### Gerar o instalador .exe
-
-```bash
-npm run build-win
-```
-
-> O instalador é gerado em `dist/` — procure por `Simulado SEPLAG-RJ Setup 1.0.0.exe`
+| Script | Ação |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm start` | Servir o build |
+| `npm run lint` | ESLint |
+| `npm run type-check` | Checagem de tipos |
 
 ---
 
-## 🔑 Chave API
-
-- A chave começa com `sk-ant-api...`
-- Ela é salva localmente no seu computador
-- Custo estimado: ~R$ 0,05 a R$ 0,10 por simulado de 10 questões
-- Sem chave, o app não gera questões
-
----
-
-## 🏗 Estrutura do projeto
+## 🏗 Arquitetura
 
 ```
-seplag-untamed-quiz/
-├── main.js              # Processo principal Electron (CORS, gerador de fundos)
-├── package.json
-├── src/
-│   ├── index.html       # App completo (HTML + CSS + JS inline)
-│   └── gen-bg.html      # Gerador SVG dos 3 fundos temáticos
-└── assets/
-    ├── bg-sim.jpg       # Lotus Pier (gerado automaticamente na 1ª execução)
-    ├── bg-rev.jpg       # Cloud Recesses (gerado automaticamente)
-    └── bg-hist.jpg      # Burial Mounds (gerado automaticamente)
+src/
+├── app/                    # Next.js App Router
+│   ├── layout.tsx          # Root (fonte Inter, tema escuro)
+│   ├── page.tsx            # Fluxo: Auth → Criação de Personagem → Jogo
+│   └── globals.css
+├── components/
+│   ├── auth/               # AuthScreen, Login, Register, RecoverPassword
+│   ├── game/               # HUD, DialogBox, CharacterCreation, Joystick, GameManager
+│   └── GameContainer.tsx   # Une o canvas Phaser + overlay React
+├── game/                   # Camada Phaser
+│   ├── EventBus.ts         # Ponte de eventos React ↔ Phaser
+│   ├── main.ts             # Config do Phaser.Game
+│   ├── PhaserGame.tsx      # Wrapper React (client-only)
+│   └── scenes/             # Boot → Preloader → Academy
+├── store/                  # Zustand: useAuthStore, usePlayerStore
+├── services/               # characterService (persistência Supabase)
+├── lib/                    # supabaseClient (com guard de configuração)
+├── utils/                  # learning-content (Hanzi)
+└── types/                  # game.ts
+supabase/migrations/        # schema SQL + RLS
+public/assets/
+├── maps/academy_initial.json   # mapa Tiled (chão + paredes)
+├── maps/academy_tileset.png    # (a adicionar)
+└── entities/player.png|sifu.png # (a adicionar)
 ```
 
-> Os fundos em `assets/` são gerados automaticamente via SVG → Canvas na primeira execução.
+**Comunicação React ↔ Phaser:** feita via `EventBus` (um `Phaser.Events.EventEmitter`). O React cuida da UI pesada (auth, diálogos, HUD) e o Phaser do mundo. O `GameContainer` é carregado com `dynamic(..., { ssr: false })` para evitar conflitos de SSR.
 
 ---
 
-## ⚙ Tecnologias
+## 🎮 Loop atual (MVP)
 
-- **Electron 26** — app desktop Windows/Mac/Linux
-- **Anthropic Claude Sonnet 4.6** — geração de questões via API
-- **Web Audio API** — sons e música pentatônica sem arquivos externos
-- **HTML5 Canvas** — animação de pétalas e geração dos fundos SVG
-- **localStorage** — persistência de progresso por usuário
+1. **Login / Cadastro** (Supabase Auth)
+2. **Criação de personagem** (nome, pele, cabelo) → salvo em `characters`
+3. **Mundo (AcademyScene)** — mova-se com WASD/setas (ou joystick no mobile)
+4. **Encoste no Sifu Li** → diálogo abre
+5. **Aprenda os 5 Hanzi iniciais** → ganha XP, persiste em `learning_progress`
+6. **Autosave** de posição a cada 10s
 
 ---
 
-## 🐛 Problemas comuns
+## 🗺 Próximos passos
 
-**"electron não reconhecido"** → Feche e reabra o terminal após instalar o Node.js
-
-**"npm install falha"** → Tente `npm install --legacy-peer-deps`
-
-**"Erro ao gerar questões"** → Verifique a chave API e os créditos na conta Anthropic
-
-**Fundo preto/sem imagem** → Os fundos são gerados na primeira execução; aguarde alguns segundos
+- Adicionar artes reais (spritesheets do herói/Sifu, tileset da Academia)
+- Combate "Duelo de Pincéis" (identificar Hanzi/tom)
+- Motor de Repetição Espaçada (SRS / SM-2)
+- Demais regiões/biomas e sistema de construção da Academia
 
 ---
 
 ## 📄 Licença
 
-Projeto educacional, sem fins comerciais. Não afiliado à SEPLAG-RJ, FGV ou à produção de *The Untamed / 陈情令*.
-
----
-
-*陈情令 · The Untamed · 修道 · 莲花坞 · 雲深不知處 · 乱葬岗*
+Projeto educacional, sem fins comerciais.
