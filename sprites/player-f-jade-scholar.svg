@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 128" width="64" height="128">
+  <defs>
+<radialGradient id="g1" cx="32" cy="18" r="17" fx="28" fy="14" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fff0e0" stop-opacity="1"/><stop offset="55%" stop-color="#f5c899" stop-opacity="1"/><stop offset="100%" stop-color="#d48860" stop-opacity="1"/></radialGradient>
+<linearGradient id="g3" x1="32" y1="42" x2="32" y2="116" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#187158" stop-opacity="1"/><stop offset="40%" stop-color="#065f46" stop-opacity="1"/><stop offset="100%" stop-color="#004930" stop-opacity="1"/></linearGradient>
+<linearGradient id="g4" x1="8" y1="48" x2="56" y2="92" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#126b52" stop-opacity="1"/><stop offset="100%" stop-color="#00432a" stop-opacity="1"/></linearGradient>
+<linearGradient id="g5" x1="32" y1="48" x2="32" y2="116" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f0fdf4" stop-opacity="1"/><stop offset="100%" stop-color="#e4f1e8" stop-opacity="1"/></linearGradient>
+<radialGradient id="g6" cx="26" cy="24" r="3.5" fx="25" fy="23" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7dd3fc" stop-opacity="1"/><stop offset="45%" stop-color="#2563eb" stop-opacity="1"/><stop offset="100%" stop-color="#1e3a8a" stop-opacity="1"/></radialGradient>
+<radialGradient id="g7" cx="38" cy="24" r="3.5" fx="37" fy="23" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#7dd3fc" stop-opacity="1"/><stop offset="45%" stop-color="#2563eb" stop-opacity="1"/><stop offset="100%" stop-color="#1e3a8a" stop-opacity="1"/></radialGradient>
+<linearGradient id="g8" x1="20" y1="118" x2="44" y2="126" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#302d2b" stop-opacity="1"/><stop offset="100%" stop-color="#1c1917" stop-opacity="1"/></linearGradient>
+<linearGradient id="g9" x1="32" y1="6" x2="32" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#332b2b" stop-opacity="1"/><stop offset="100%" stop-color="#1a1212" stop-opacity="1"/></linearGradient>
+<linearGradient id="g10" x1="32" y1="4" x2="32" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#91ffda" stop-opacity="1"/><stop offset="50%" stop-color="#64ddad" stop-opacity="1"/><stop offset="100%" stop-color="#50c999" stop-opacity="1"/></linearGradient>
+<linearGradient id="g11" x1="32" y1="2" x2="32" y2="18" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#2e2626" stop-opacity="1"/><stop offset="100%" stop-color="#100808" stop-opacity="1"/></linearGradient>
+  </defs>
+<!-- robe shadow sides -->
+<path d="M 12,46 C 8,68 5,90 6,116 L 10,116 C 9,90 12,68 16,46 Z" fill="#003c23" opacity="0.45"/>
+<path d="M 52,46 C 56,68 59,90 58,116 L 54,116 C 55,90 52,68 48,46 Z" fill="#003c23" opacity="0.45"/>
+<!-- left sleeve -->
+<path d="M 6,50 C 2,60 0,76 2,94 L 14,92 C 12,76 14,62 18,50 Z"
+  fill="url(#g4)" stroke="#003219" stroke-width="0.7" stroke-linejoin="round"/>
+<!-- right sleeve -->
+<path d="M 58,50 C 62,60 64,76 62,94 L 50,92 C 52,76 50,62 46,50 Z"
+  fill="url(#g4)" stroke="#003219" stroke-width="0.7" stroke-linejoin="round"/>
+<!-- inner robe hem -->
+<path d="M 22,110 L 32,118 L 42,110 L 48,116 L 32,126 L 16,116 Z" fill="url(#g5)"/>
+<!-- main robe -->
+<path d="M 18,46 C 14,58 10,78 8,116 L 56,116 C 54,78 50,58 46,46 Z"
+  fill="url(#g3)" stroke="#003219" stroke-width="0.8" stroke-linejoin="round"/>
+<!-- v-neck inner -->
+<path d="M 23,46 L 32,60 L 41,46" fill="none" stroke="#f0fdf4" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 25,46 L 32,58 L 39,46" fill="#e8f5ec" opacity="0.5"/>
+
+<line x1="28" y1="76" x2="36" y2="76" stroke="#6ee7b7" stroke-width="1.2" opacity="0.8"/>
+<line x1="26" y1="82" x2="38" y2="82" stroke="#6ee7b7" stroke-width="1.2" opacity="0.8"/>
+<line x1="28" y1="88" x2="36" y2="88" stroke="#6ee7b7" stroke-width="1.2" opacity="0.7"/>
+<path d="M 29,94 C 29,91 35,91 35,94 L 35,100 C 35,103 29,103 29,100 Z" fill="none" stroke="#6ee7b7" stroke-width="1" opacity="0.6"/>
+<!-- belt -->
+<path d="M 16,72 L 48,72 L 48,78 L 16,78 Z" fill="#92400e" stroke="#792700" stroke-width="0.7"/>
+<!-- belt knot -->
+<path d="M 28,69 L 32,73 L 36,69 L 36,81 L 32,77 L 28,81 Z" fill="#a85624" stroke="#7e2c00" stroke-width="0.6"/>
+<ellipse cx="32" cy="75" rx="3" ry="2.5" fill="#a85624" stroke="#742200" stroke-width="0.5"/>
+<!-- neck -->
+<rect x="27" y="36" width="10" height="12" rx="3" fill="url(#g1)"/>
+<path d="M 27,38 L 37,38" stroke="#d48860" stroke-width="0.5" opacity="0.4"/>
+<!-- head -->
+<ellipse cx="32" cy="21" rx="14" ry="16" fill="url(#g1)" stroke="#dfb283" stroke-width="0.8"/>
+<!-- cheek blush (female) -->
+<ellipse cx="22" cy="25" rx="4" ry="2.5" fill="#f08090" opacity="0.25"/>
+<ellipse cx="42" cy="25" rx="4" ry="2.5" fill="#f08090" opacity="0.25"/>
+<!-- scholar hat -->
+<!-- wide brim -->
+<rect x="8" y="13" width="48" height="5" rx="1.5"
+  fill="url(#g11)" stroke="#040000" stroke-width="0.8"/>
+<!-- tall crown -->
+<rect x="20" y="0" width="24" height="16" rx="2"
+  fill="#1a1212" stroke="#040000" stroke-width="0.8"/>
+<!-- crown highlight line -->
+<line x1="22" y1="7" x2="42" y2="7" stroke="#302828" stroke-width="0.8" opacity="0.6"/>
+<!-- gold trim on brim -->
+<line x1="8" y1="13" x2="56" y2="13" stroke="#c9a86c" stroke-width="1.2"/>
+<!-- hair at sides -->
+<path d="M 18,18 C 15,22 15,28 17,32" fill="none" stroke="#1a1212" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 46,18 C 49,22 49,28 47,32" fill="none" stroke="#1a1212" stroke-width="2.2" stroke-linecap="round"/>
+<!-- eyebrows -->
+<path d="M 21,18 C 23,16.5 27,16.5 29,18" fill="none" stroke="#150d0d" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 35,18 C 37,16.5 41,16.5 43,18" fill="none" stroke="#150d0d" stroke-width="1.4" stroke-linecap="round"/>
+<!-- eyes -->
+<!-- sclera -->
+<ellipse cx="26" cy="24" rx="4.5" ry="3.8" fill="white" stroke="#dcaf80" stroke-width="0.6"/>
+<ellipse cx="38" cy="24" rx="4.5" ry="3.8" fill="white" stroke="#dcaf80" stroke-width="0.6"/>
+<!-- iris -->
+<circle cx="26" cy="24.5" r="3.2" fill="url(#g6)"/>
+<circle cx="38" cy="24.5" r="3.2" fill="url(#g7)"/>
+<!-- pupil -->
+<circle cx="26" cy="24.5" r="1.6" fill="#070714"/>
+<circle cx="38" cy="24.5" r="1.6" fill="#070714"/>
+<!-- catch light -->
+<circle cx="24.8" cy="23.1" r="0.9" fill="white" opacity="0.95"/>
+<circle cx="36.8" cy="23.1" r="0.9" fill="white" opacity="0.95"/>
+<!-- upper eyelid crease -->
+<path d="M 21.5,21.5 C 24,20 28,20 30.5,21.5" fill="none" stroke="#cfa273" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M 33.5,21.5 C 36,20 40,20 42.5,21.5" fill="none" stroke="#cfa273" stroke-width="0.9" stroke-linecap="round"/>
+<!-- lashes -->
+<path d="M 21.5,21.5 L 20,19 M 23,20.5 L 22.5,18 M 25,20.2 L 25,18 M 27,20.5 L 28,18.5 M 30.5,21.5 L 31.5,19.5" stroke="#150d0d" stroke-width="0.85" stroke-linecap="round"/>
+<path d="M 33.5,21.5 L 32,19 M 35,20.5 L 34.5,18 M 37,20.2 L 37,18 M 39,20.5 L 40,18.5 M 42.5,21.5 L 43.5,19.5" stroke="#150d0d" stroke-width="0.85" stroke-linecap="round"/>
+<!-- nose + mouth -->
+<path d="M 30.5,28.5 C 31,30 33,30 33.5,28.5" fill="none" stroke="#d9ac7d" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M 27,32.5 C 29.5,35 34.5,35 37,32.5" fill="none" stroke="#d4706c" stroke-width="1.1" stroke-linecap="round"/>
+<!-- nostril hints -->
+<circle cx="30" cy="29.5" r="0.7" fill="#d2a576" opacity="0.5"/>
+<circle cx="34" cy="29.5" r="0.7" fill="#d2a576" opacity="0.5"/>
+<!-- hands -->
+<ellipse cx="5" cy="94" rx="4.5" ry="3.5" fill="#f5c899" stroke="#dfb283" stroke-width="0.6"/>
+<ellipse cx="59" cy="94" rx="4.5" ry="3.5" fill="#f5c899" stroke="#dfb283" stroke-width="0.6"/>
+<!-- finger lines -->
+<path d="M 2,93 L 3,96 M 4.5,92 L 5,96 M 7,92 L 7.5,96" stroke="#d7aa7b" stroke-width="0.5" opacity="0.5"/>
+<path d="M 56,92 L 56.5,96 M 58.5,92 L 59,96 M 61,93 L 61.5,96" stroke="#d7aa7b" stroke-width="0.5" opacity="0.5"/>
+<!-- shoes -->
+<path d="M 14,116 C 12,118 10,122 12,126 L 26,126 C 28,124 28,120 26,116 Z"
+  fill="url(#g8)" stroke="#0d0a08" stroke-width="0.7"/>
+<path d="M 50,116 C 52,118 54,122 52,126 L 38,126 C 36,124 36,120 38,116 Z"
+  fill="url(#g8)" stroke="#0d0a08" stroke-width="0.7"/>
+<!-- shoe sole line -->
+<path d="M 12,124 L 26,124" stroke="#302d2b" stroke-width="0.7" opacity="0.5"/>
+<path d="M 38,124 L 52,124" stroke="#302d2b" stroke-width="0.7" opacity="0.5"/>
+</svg>
