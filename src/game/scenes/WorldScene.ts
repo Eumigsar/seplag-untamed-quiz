@@ -599,6 +599,13 @@ export default class WorldScene extends Phaser.Scene {
     });
   }
 
+  // Called by GameCanvas when the store's currentRegion changes (e.g. from MapPanel travel)
+  updateRegion(regionId: RegionId) {
+    if (regionId !== this.currentRegion) {
+      this.changeRegion(regionId);
+    }
+  }
+
   // ─── Update ────────────────────────────────────────────────────────────────
 
   update(_time: number, _delta: number) {
