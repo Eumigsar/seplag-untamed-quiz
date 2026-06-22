@@ -173,12 +173,12 @@ export class Game extends Scene {
 
     [[3,3],[3,4],[4,3],[COLS-4,3],[COLS-4,4],[COLS-5,3],
      [3,ROWS-4],[3,ROWS-5],[4,ROWS-4],[COLS-4,ROWS-4],[COLS-4,ROWS-5],[COLS-5,ROWS-4]]
-      .forEach(([c,r]) => addWall(c, r));
+      .forEach(([c,r]) => addWall(c!, r!));
 
     [[2.5, 2.5],[COLS-2.5, 2.5],[2.5, ROWS-2.5],[COLS-2.5, ROWS-2.5]].forEach(([c, r]) => {
-      const lantern = this.add.image(c * TILE, r * TILE, 'lantern').setDepth(5);
+      const lantern = this.add.image(c! * TILE, r! * TILE, 'lantern').setDepth(5);
       this.tweens.add({ targets: lantern, y: lantern.y - 4, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      this.add.circle(c * TILE, r * TILE + 10, 28, 0xffaa00, 0.08).setDepth(4);
+      this.add.circle(c! * TILE, r! * TILE + 10, 28, 0xffaa00, 0.08).setDepth(4);
     });
 
     const startX = Math.floor(COLS / 2) * TILE;

@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Bus, EV } from '@/game/EventBus';
-import { HANZI } from '@/utils/hanzi';
+import { HANZI, type HanziCard } from '@/utils/hanzi';
 import { usePlayer } from '@/store/player';
 import { supabase, configured } from '@/lib/supabase';
-import type { HanziCard } from '@/types';
 
 export default function Dialog() {
   const [open, setOpen] = useState(false);
@@ -43,6 +42,7 @@ export default function Dialog() {
   return (
     <div className="fixed inset-0 flex items-end justify-center p-4 bg-ink/50 backdrop-blur-sm z-50 animate-fade-in">
       <div className="w-full max-w-3xl card border-gold/30 p-6 shadow-[0_0_60px_#D4AF3730] animate-slide-up">
+        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full border border-gold/50 bg-gold/10 flex items-center justify-center">
@@ -66,10 +66,14 @@ export default function Dialog() {
             <button onClick={close} className="text-paper/30 hover:text-paper/70 transition-colors text-xl leading-none">✕</button>
           </div>
         </div>
+
+        {/* NPC text */}
         <p className="text-paper/70 text-sm leading-relaxed mb-5 border-l-2 border-gold/30 pl-4 italic">
-          "Os caracteres são a alma da língua. Cada traço carrega séculos de história.
-          Toque em cada símbolo abaixo para absorver sua essência, jovem aluno."
+          &quot;Os caracteres são a alma da língua. Cada traço carrega séculos de história.
+          Toque em cada símbolo abaixo para absorver sua essência, jovem aluno.&quot;
         </p>
+
+        {/* Hanzi grid */}
         <div className="grid grid-cols-5 gap-3 mb-5">
           {HANZI.map(h => {
             const isLearned = learned.has(h.hanzi);
@@ -95,16 +99,19 @@ export default function Dialog() {
             );
           })}
         </div>
+
+        {/* Mnemonic for flipped card */}
         {flipped && (
           <div className="mb-4 p-3 bg-gold/5 border border-gold/15 rounded-lg text-xs text-paper/60 italic animate-fade-in">
-            💡 {HANZI.find(h => h.hanzi === flipped)?.mnemonic}
+            {HANZI.find(h => h.hanzi === flipped)?.mnemonic}
           </div>
         )}
+
         <button
           onClick={close}
           className={`w-full py-3 rounded-lg font-semibold transition-all ${done >= 5 ? 'btn-gold' : 'btn-ghost opacity-60'}`}
         >
-          {done === 0 ? 'Toque nos caracteres para aprender' : done < 5 ? `Continue — aprenda mais ${5 - done}` : `✨ Excelente! ${done} Hanzi dominados — Continuar`}
+          {done === 0 ? 'Toque nos caracteres para aprender' : done < 5 ? `Continue — aprenda mais ${5 - done}` : `Excelente! ${done} Hanzi dominados — Continuar`}
         </button>
       </div>
     </div>

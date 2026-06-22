@@ -1,4 +1,9 @@
-import type { HanziCard } from '@/types';
+export interface HanziCard {
+  hanzi: string;
+  pinyin: string;
+  meaning: string;
+  mnemonic: string;
+}
 
 export const HANZI: HanziCard[] = [
   { hanzi: '人', pinyin: 'rén',   meaning: 'Pessoa',    mnemonic: 'Duas pernas caminhando — um ser humano em movimento.' },
